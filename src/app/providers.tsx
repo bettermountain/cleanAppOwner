@@ -1,6 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { BrowserRouter } from 'react-router-dom'
+import { ThemeProvider } from '@mui/material/styles'
+import { CssBaseline } from '@mui/material'
+import { muiTheme } from '../theme/mui-theme'
 import { useState } from 'react'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -50,9 +53,7 @@ export function Providers({ children }: ProvidersProps) {
   )
 
   return (
-    // Wrap the app with ThemeProvider to enable Material UI's design system
-    <ThemeProvider theme={theme}>
-      {/* CssBaseline provides a sensible CSS reset for better UX */}
+    <ThemeProvider theme={muiTheme}>
       <CssBaseline />
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>

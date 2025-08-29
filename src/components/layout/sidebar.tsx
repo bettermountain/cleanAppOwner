@@ -1,11 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
-import {
-  Box,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography,
+import { 
+  Drawer, 
+  List, 
+  ListItem, 
+  ListItemButton, 
+  ListItemIcon, 
+  ListItemText, 
+  Typography, 
+  Box 
 } from '@mui/material'
 import {
   Home,
@@ -36,49 +38,53 @@ export function Sidebar() {
   const location = useLocation()
 
   return (
-    <Box
-      component="nav"
+    <Drawer
+      variant="permanent"
       sx={{
         width: 256,
         flexShrink: 0,
-        borderRight: 1,
-        borderColor: 'divider',
-        bgcolor: 'background.paper',
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100vh',
+        '& .MuiDrawer-paper': {
+          width: 256,
+          boxSizing: 'border-box',
+        },
       }}
     >
-      {/* Application title */}
       <Box sx={{ p: 3, borderBottom: 1, borderColor: 'divider' }}>
-        <Typography variant="h6">CleanApp Owner</Typography>
+        <Typography variant="h6" component="h1" fontWeight={600}>
+          CleanApp Owner
+        </Typography>
       </Box>
-      <List>
+      <List sx={{ pt: 2 }}>
         {navigation.map((item) => {
           const isActive = location.pathname === item.href
+          const IconComponent = item.icon
           return (
-            <ListItemButton
-              key={item.name}
-              component={Link}
-              to={item.href}
-              selected={isActive}
-              // When selected, use theme colors to highlight the item
-              sx={{
-                '&.Mui-selected': {
-                  bgcolor: 'action.selected',
-                  color: 'primary.main',
-                  '& .MuiListItemIcon-root': { color: 'primary.main' },
-                },
-              }}
-            >
-              <ListItemIcon>
-                <item.icon size={20} />
-              </ListItemIcon>
-              <ListItemText primary={item.name} />
-            </ListItemButton>
+            <ListItem key={item.name} disablePadding sx={{ px: 1 }}>
+              <ListItemButton
+                component={Link}
+                to={item.href}
+                selected={isActive}
+                sx={{
+                  borderRadius: 1,
+                  mx: 1,
+                  '&.Mui-selected': {
+                    backgroundColor: 'primary.main',
+                    color: 'primary.contrastText',
+                    '&:hover': {
+                      backgroundColor: 'primary.dark',
+                    },
+                  },
+                }}
+              >
+                <ListItemIcon sx={{ color: isActive ? 'inherit' : 'text.secondary' }}>
+                  <IconComponent size={20} />
+                </ListItemIcon>
+                <ListItemText primary={item.name} />
+              </ListItemButton>
+            </ListItem>
           )
         })}
-      </List>
-    </Box>
+      </nav>
+    </div>
   )
 }
