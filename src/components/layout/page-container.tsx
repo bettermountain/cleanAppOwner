@@ -1,4 +1,7 @@
-import { Container, Stack, ContainerProps } from '@mui/material'
+
+import { Container, Stack } from '@mui/material'
+// Import type separately so it doesn't inflate the runtime bundle
+import type { ContainerProps } from '@mui/material/Container'
 import { PropsWithChildren } from 'react'
 
 /**
@@ -7,7 +10,9 @@ import { PropsWithChildren } from 'react'
  */
 export function PageContainer({ children, ...props }: PropsWithChildren<ContainerProps>) {
   return (
-    <Container sx={{ py: 4 }} {...props}>
+    // Limit width for comfortable reading and apply vertical padding
+    <Container maxWidth="lg" sx={{ py: 4 }} {...props}>
+      {/* Stack provides consistent vertical spacing between children */}
       <Stack spacing={3}>{children}</Stack>
     </Container>
   )
