@@ -26,6 +26,8 @@ import {
 } from '@mui/icons-material'
 import { mockNotifications } from '@/data/notifications'
 import { PageContainer } from '@/components/layout/page-container'
+import { mockNotifications } from '@/data/notifications'
+import type { Notification } from '@/schemas'
 
 // Single notification item type derived from mock data
 type Notification = (typeof mockNotifications)[number]
@@ -104,7 +106,16 @@ export function NotificationsPage() {
     return `${Math.floor(diffInMinutes / 1440)}日前`
   }
 
-  const unreadCount = mockNotifications.filter(n => !n.readAt).length
+  // サマリー表示用の件数集計
+  const summary = useMemo(
+    () => ({
+      unread: unreadCount,
+      application: notifications.filter(n => n.type === 'job_application').length,
+      submitted: notifications.filter(n => n.type === 'job_submitted').length,
+      billing: notifications.filter(n => ['invoice_issued', 'payment_received'].includes(n.type)).length,
+    }),
+    [notifications, unreadCount]
+  )
 
   return (
     <PageContainer>
