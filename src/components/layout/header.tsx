@@ -1,3 +1,5 @@
+
+import React from 'react'
 import AppBar from '@mui/material/AppBar'
 import Toolbar from '@mui/material/Toolbar'
 import IconButton from '@mui/material/IconButton'
@@ -7,7 +9,7 @@ import InputAdornment from '@mui/material/InputAdornment'
 import Box from '@mui/material/Box'
 import Avatar from '@mui/material/Avatar'
 import Tooltip from '@mui/material/Tooltip'
-import { Bell, Search } from 'lucide-react'
+import { Bell, Search, User } from 'lucide-react'
 
 // Responsive application header built with Material UI for a clean UX
 export function Header() {

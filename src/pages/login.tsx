@@ -228,7 +228,6 @@ export function LoginPage() {
             </Stack>
           </Stack>
         </Paper>
-
         {/* フッター */}
         <Typography variant="body2" color="text.secondary" align="center" mt={8}>
           © 2025 CleanApp Owner. すべての権利を保有します。
