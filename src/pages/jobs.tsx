@@ -1,230 +1,283 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { StatusBadge } from '@/components/common/status-badge'
-import { Plus, Search, Calendar, Clock, MapPin, DollarSign, Users, Star, ArrowRight, Filter } from 'lucide-react'
-import { mockJobs } from '@/data/jobs'
 import { Link } from 'react-router-dom'
 import { PageContainer } from '@/components/layout/page-container'
+import { StatusBadge } from '@/components/common/status-badge'
+import { mockJobs } from '@/data/jobs'
+import { useMemo, useState } from 'react'
 
-// Jobs page lists cleaning jobs with quick filters and stats
+import {
+  Box,
+  Stack,
+  Typography,
+  Button,
+  TextField,
+  InputAdornment,
+  Chip,
+  Paper,
+  Tabs,
+  Tab,
+  ToggleButton,
+  ToggleButtonGroup,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+} from '@mui/material'
+
+import {
+  Add as AddIcon,
+  Search as SearchIcon,
+  CalendarMonth as CalendarMonthIcon,
+  AccessTime as AccessTimeIcon,
+  Place as PlaceIcon,
+  AttachMoney as AttachMoneyIcon,
+  Star as StarIcon,
+} from '@mui/icons-material'
+
+type Density = 'comfortable' | 'compact'
+
+// Jobs page redesigned with Material UI for a minimal, information-first layout
 export function JobsPage() {
-  // Map job status to card color accents
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'open': return 'bg-green-50 border-green-200'
-      case 'assigned': return 'bg-blue-50 border-blue-200'
-      case 'in_progress': return 'bg-yellow-50 border-yellow-200'
-      case 'completed': return 'bg-gray-50 border-gray-200'
-      case 'submitted': return 'bg-purple-50 border-purple-200'
-      case 'approved': return 'bg-emerald-50 border-emerald-200'
-      case 'cancelled': return 'bg-red-50 border-red-200'
-      case 'rework': return 'bg-orange-50 border-orange-200'
-      default: return 'bg-gray-50 border-gray-200'
-    }
-  }
+  const [query, setQuery] = useState('')
+  const [tab, setTab] = useState<'all' | 'open' | 'progress' | 'submitted' | 'done'>('all')
+  const [from, setFrom] = useState('') // YYYY-MM-DD
+  const [to, setTo] = useState('')
+  const [sort, setSort] = useState<'date_desc' | 'date_asc' | 'pay_desc' | 'pay_asc'>('date_desc')
+  const [density, setDensity] = useState<Density>('comfortable')
 
-  const getPayTypeLabel = (payType: string) => {
-    return payType === 'hourly' ? '時給' : '固定'
-  }
+  const getPayTypeLabel = (payType: string) => (payType === 'hourly' ? '時給' : '固定')
+
+  const counts = useMemo(() => ({
+    open: mockJobs.filter((j) => j.status === 'open').length,
+    progress: mockJobs.filter((j) => ['assigned', 'in_progress'].includes(j.status)).length,
+    submitted: mockJobs.filter((j) => j.status === 'submitted').length,
+    done: mockJobs.filter((j) => ['completed', 'approved'].includes(j.status)).length,
+  }), [])
+
+  const filtered = useMemo(() => {
+    const inTab = (status: string) => {
+      if (tab === 'all') return true
+      if (tab === 'open') return status === 'open'
+      if (tab === 'progress') return ['assigned', 'in_progress'].includes(status)
+      if (tab === 'submitted') return status === 'submitted'
+      if (tab === 'done') return ['completed', 'approved'].includes(status)
+      return true
+    }
+
+    const inDate = (d: string) => {
+      if (from && d < from) return false
+      if (to && d > to) return false
+      return true
+    }
+
+    const q = query.trim().toLowerCase()
+
+    return mockJobs
+      .filter((j) => inTab(j.status))
+      .filter((j) => inDate(j.jobDate))
+      .filter((j) =>
+        !q ||
+        j.property.name.toLowerCase().includes(q) ||
+        j.property.address.toLowerCase().includes(q) ||
+        j.description.toLowerCase().includes(q)
+      )
+  }, [tab, from, to, query])
+
+  const data = useMemo(() => {
+    const sorted = [...filtered]
+    sorted.sort((a, b) => {
+      if (sort === 'date_desc') return a.jobDate < b.jobDate ? 1 : -1
+      if (sort === 'date_asc') return a.jobDate > b.jobDate ? 1 : -1
+      if (sort === 'pay_desc') return b.payAmount - a.payAmount
+      if (sort === 'pay_asc') return a.payAmount - b.payAmount
+      return 0
+    })
+    return sorted
+  }, [filtered, sort])
+
+  const rowPy = density === 'compact' ? 0.75 : 1.25
+  const fontSize = density === 'compact' ? '0.85rem' : '0.95rem'
 
   return (
-    <PageContainer className="animate-fade-in">
-      {/* Page header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gradient">案件管理</h1>
-          <p className="text-muted-foreground mt-1">清掃案件の作成・管理・進捗確認</p>
-        </div>
-        <Button className="shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-          <Plus className="mr-2 h-4 w-4" />
-          新規案件作成
-        </Button>
-      </div>
+    <PageContainer>
+      {/* Title + Primary action */}
+      <Box display="flex" alignItems="center" justifyContent="space-between">
+        <Box>
+          <Typography variant="h4" fontWeight={700}>案件管理</Typography>
+          <Typography variant="body2" color="text.secondary" mt={0.5}>清掃案件の作成・管理・進捗確認</Typography>
+        </Box>
+        <Button variant="contained" startIcon={<AddIcon />}>新規案件作成</Button>
+      </Box>
 
-      <div className="glass-effect rounded-lg p-4">
-        <div className="flex items-center space-x-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-            <Input
-              placeholder="案件名、物件名で検索..."
-              className="pl-10 border-0 bg-background/50 focus:bg-background transition-colors"
-            />
-          </div>
-          <Button variant="outline" className="shrink-0">
-            <Calendar className="mr-2 h-4 w-4" />
-            日付フィルター
-          </Button>
-          <Button variant="outline" className="shrink-0">
-            <Filter className="mr-2 h-4 w-4" />
-            ステータス
-          </Button>
-        </div>
-      </div>
+      {/* Status tabs with counts */}
+      <Paper variant="outlined" sx={{ borderRadius: 2 }}>
+        <Tabs
+          value={tab}
+          onChange={(_, v) => setTab(v)}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
+          <Tab value="all" label="すべて" />
+          <Tab value="open" label={`公開中 (${counts.open})`} />
+          <Tab value="progress" label={`進行中 (${counts.progress})`} />
+          <Tab value="submitted" label={`確認待ち (${counts.submitted})`} />
+          <Tab value="done" label={`完了 (${counts.done})`} />
+        </Tabs>
+      </Paper>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-green-700">公開中</p>
-                <p className="text-2xl font-bold text-green-900">{mockJobs.filter(j => j.status === 'open').length}</p>
-              </div>
-              <div className="h-8 w-8 bg-green-500 rounded-full flex items-center justify-center">
-                <Users className="h-4 w-4 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-700">進行中</p>
-                <p className="text-2xl font-bold text-blue-900">{mockJobs.filter(j => ['assigned', 'in_progress'].includes(j.status)).length}</p>
-              </div>
-              <div className="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <Clock className="h-4 w-4 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-purple-700">確認待ち</p>
-                <p className="text-2xl font-bold text-purple-900">{mockJobs.filter(j => j.status === 'submitted').length}</p>
-              </div>
-              <div className="h-8 w-8 bg-purple-500 rounded-full flex items-center justify-center">
-                <Search className="h-4 w-4 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-emerald-700">完了</p>
-                <p className="text-2xl font-bold text-emerald-900">{mockJobs.filter(j => ['completed', 'approved'].includes(j.status)).length}</p>
-              </div>
-              <div className="h-8 w-8 bg-emerald-500 rounded-full flex items-center justify-center">
-                <Star className="h-4 w-4 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Filter toolbar */}
+      <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ xs: 'stretch', md: 'center' }}>
+          <TextField
+            fullWidth
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="案件名・住所・説明を検索"
+            size="small"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon color="action" />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            label="開始日"
+            type="date"
+            size="small"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+          <TextField
+            label="終了日"
+            type="date"
+            size="small"
+            value={to}
+            onChange={(e) => setTo(e.target.value)}
+            InputLabelProps={{ shrink: true }}
+          />
+          <FormControl size="small" sx={{ minWidth: 160 }}>
+            <InputLabel id="sort-label">並び替え</InputLabel>
+            <Select
+              labelId="sort-label"
+              label="並び替え"
+              value={sort}
+              onChange={(e) => setSort(e.target.value as typeof sort)}
+            >
+              <MenuItem value="date_desc">日付(新しい順)</MenuItem>
+              <MenuItem value="date_asc">日付(古い順)</MenuItem>
+              <MenuItem value="pay_desc">報酬(高い順)</MenuItem>
+              <MenuItem value="pay_asc">報酬(低い順)</MenuItem>
+            </Select>
+          </FormControl>
+          <ToggleButtonGroup
+            size="small"
+            exclusive
+            value={density}
+            onChange={(_, v) => v && setDensity(v)}
+          >
+            <ToggleButton value="comfortable">標準</ToggleButton>
+            <ToggleButton value="compact">コンパクト</ToggleButton>
+          </ToggleButtonGroup>
+        </Stack>
+      </Paper>
 
-      <div className="space-y-4">
-        {mockJobs.map((job, index) => (
-          <Card key={job.id} className={`group hover:shadow-xl transition-all duration-300 hover:scale-[1.01] animate-slide-in border-0 shadow-md ${getStatusColor(job.status)}`} style={{ animationDelay: `${index * 50}ms` }}>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                    {job.property.name}の清掃
-                  </CardTitle>
-                  <div className="flex items-center text-sm text-muted-foreground mt-1">
-                    <MapPin className="mr-1 h-4 w-4" />
-                    {job.property.address}
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2">{job.description}</p>
-                </div>
-                <StatusBadge status={job.status} />
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="flex items-center text-sm">
-                  <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="font-medium">{new Date(job.jobDate).toLocaleDateString('ja-JP')}</div>
-                    <div className="text-xs text-muted-foreground">{job.startTime}</div>
-                  </div>
-                </div>
-                <div className="flex items-center text-sm">
-                  <Clock className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="font-medium">{job.expectedHours}時間</div>
-                    <div className="text-xs text-muted-foreground">予定</div>
-                  </div>
-                </div>
-                <div className="flex items-center text-sm">
-                  <DollarSign className="mr-2 h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="font-medium">¥{job.payAmount.toLocaleString()}</div>
-                    <div className="text-xs text-muted-foreground">{getPayTypeLabel(job.payType)}</div>
-                  </div>
-                </div>
-                <div className="text-sm">
-                  {job.status === 'open' && job.applications && (
-                    <div>
-                      <div className="font-medium text-green-600">{job.applications}件の応募</div>
-                      <div className="text-xs text-muted-foreground">応募中</div>
-                    </div>
-                  )}
-                  {job.assignedWorker && (
-                    <div>
-                      <div className="font-medium">{job.assignedWorker.name}</div>
-                      <div className="text-xs text-muted-foreground flex items-center">
-                        <Star className="h-3 w-3 fill-amber-400 text-amber-400 mr-1" />
-                        {job.assignedWorker.rating}
-                      </div>
-                    </div>
-                  )}
-                  {job.status === 'completed' && job.rating && (
-                    <div>
-                      <div className="font-medium flex items-center">
-                        {'★'.repeat(job.rating)}
-                      </div>
-                      <div className="text-xs text-muted-foreground">評価済み</div>
-                    </div>
-                  )}
-                  {job.status === 'submitted' && job.photosCount && (
-                    <div>
-                      <div className="font-medium text-purple-600">{job.photosCount}枚の写真</div>
-                      <div className="text-xs text-muted-foreground">確認待ち</div>
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-2">
-                  {job.publicOrInvite === 'invite_only' && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                      指名限定
-                    </span>
-                  )}
-                  {job.tipAllowed && (
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      チップ可
-                    </span>
-                  )}
-                </div>
-                <div className="flex space-x-2">
-                  <Button variant="outline" size="sm" className="hover:bg-primary hover:text-primary-foreground transition-colors">
-                    詳細
-                  </Button>
-                  <Link to={`/jobs/${job.id}`}>
-                    <Button size="sm" className="group">
-                      管理
-                      <ArrowRight className="ml-1 h-3 w-3 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <div className="flex justify-center pt-6">
-        <Button variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors">
-          さらに表示
-        </Button>
-      </div>
+      {/* Results table */}
+      <Paper variant="outlined" sx={{ borderRadius: 2 }}>
+        <TableContainer sx={{ maxHeight: 560 }}>
+          <Table stickyHeader size={density === 'compact' ? 'small' : 'medium'}>
+            <TableHead>
+              <TableRow>
+                <TableCell>物件</TableCell>
+                <TableCell>日付・時間</TableCell>
+                <TableCell>想定時間</TableCell>
+                <TableCell>報酬</TableCell>
+                <TableCell>担当/応募</TableCell>
+                <TableCell>ステータス</TableCell>
+                <TableCell align="right">操作</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {data.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Box py={6} textAlign="center">
+                      <Typography variant="subtitle1" fontWeight={700}>該当する案件がありません</Typography>
+                      <Typography variant="body2" color="text.secondary" mt={0.5}>条件を調整してください</Typography>
+                    </Box>
+                  </TableCell>
+                </TableRow>
+              )}
+              {data.map((j) => (
+                <TableRow key={j.id} hover sx={{ '& td': { py: rowPy, fontSize } }}>
+                  <TableCell>
+                    <Stack spacing={0.5}>
+                      <Typography variant="subtitle2" fontWeight={700}>{j.property.name}の清掃</Typography>
+                      <Stack direction="row" spacing={0.5} alignItems="center">
+                        <PlaceIcon fontSize="small" color="action" />
+                        <Typography variant="caption" color="text.secondary">{j.property.address}</Typography>
+                      </Stack>
+                      <Stack direction="row" spacing={1}>
+                        {j.publicOrInvite === 'invite_only' && <Chip label="指名限定" size="small" variant="outlined" color="info" />}
+                        {j.tipAllowed && <Chip label="チップ可" size="small" variant="outlined" color="success" />}
+                      </Stack>
+                    </Stack>
+                  </TableCell>
+                  <TableCell>
+                    <Stack direction="row" spacing={0.75} alignItems="center">
+                      <CalendarMonthIcon fontSize="small" color="action" />
+                      <Typography variant="body2">
+                        {new Date(j.jobDate).toLocaleDateString('ja-JP')} {j.startTime}
+                      </Typography>
+                    </Stack>
+                  </TableCell>
+                  <TableCell>
+                    <Stack direction="row" spacing={0.75} alignItems="center">
+                      <AccessTimeIcon fontSize="small" color="action" />
+                      <Typography variant="body2">{j.expectedHours}時間</Typography>
+                    </Stack>
+                  </TableCell>
+                  <TableCell>
+                    <Stack direction="row" spacing={0.75} alignItems="center">
+                      <AttachMoneyIcon fontSize="small" color="action" />
+                      <Typography variant="body2">¥{j.payAmount.toLocaleString()}・{getPayTypeLabel(j.payType)}</Typography>
+                    </Stack>
+                  </TableCell>
+                  <TableCell>
+                    {j.assignedWorker ? (
+                      <Stack direction="row" spacing={0.5} alignItems="center">
+                        <Typography variant="body2">{j.assignedWorker.name}</Typography>
+                        <StarIcon sx={{ fontSize: 16 }} color="warning" />
+                        <Typography variant="caption" color="text.secondary">{j.assignedWorker.rating}</Typography>
+                      </Stack>
+                    ) : j.status === 'open' && j.applications ? (
+                      <Typography variant="body2" color="success.main" fontWeight={600}>{j.applications}件の応募</Typography>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">—</Typography>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <StatusBadge status={j.status} />
+                  </TableCell>
+                  <TableCell align="right">
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                      <Button component={Link} to={`/jobs/${j.id}`} size="small" variant="contained">管理</Button>
+                      <Button size="small" variant="outlined">詳細</Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
     </PageContainer>
   )
 }
