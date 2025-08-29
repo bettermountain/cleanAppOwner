@@ -141,7 +141,6 @@ export function BillingPage() {
             </CardContent>
           </Card>
         </Grid>
-
         {/* 未払い金額カード */}
         <Grid item xs={12} md={6} lg={3}>
           <Card variant="outlined" sx={{ bgcolor: 'grey.50' }}>
@@ -149,6 +148,7 @@ export function BillingPage() {
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
                   <Typography variant="subtitle2" color="text.secondary">
+
                     未払い金額
                   </Typography>
                   <Typography variant="h5" fontWeight="bold">
@@ -169,7 +169,6 @@ export function BillingPage() {
             </CardContent>
           </Card>
         </Grid>
-
         {/* 延滞金額カード */}
         <Grid item xs={12} md={6} lg={3}>
           <Card variant="outlined" sx={{ bgcolor: 'grey.50' }}>

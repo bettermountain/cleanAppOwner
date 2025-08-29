@@ -1,217 +1,290 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Bell, Check, Filter, Trash2, FileText, CreditCard, Star, AlertCircle, CheckCircle, Clock, Users } from 'lucide-react'
-import { mockNotifications } from '@/data/notifications'
-import { PageContainer } from '@/components/layout/page-container'
+import { useMemo } from 'react'
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Typography,
+  Chip,
+} from '@mui/material'
+import NotificationsIcon from '@mui/icons-material/Notifications'
+import FilterListIcon from '@mui/icons-material/FilterList'
+import DoneAllIcon from '@mui/icons-material/DoneAll'
+import DeleteIcon from '@mui/icons-material/Delete'
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import PlayArrowIcon from '@mui/icons-material/PlayArrow'
+import DescriptionIcon from '@mui/icons-material/Description'
+import ErrorIcon from '@mui/icons-material/Error'
+import PaymentIcon from '@mui/icons-material/Payment'
+import CancelIcon from '@mui/icons-material/Cancel'
+import StarIcon from '@mui/icons-material/Star'
+import DoneIcon from '@mui/icons-material/Done'
 
-// Notifications page lists system alerts for the owner
+import { PageContainer } from '@/components/layout/page-container'
+import { mockNotifications } from '@/data/notifications'
+import type { Notification } from '@/schemas'
+
+/**
+ * 通知ページ: オーナー向けの各種通知を一覧表示する
+ * Material UI を用いてシンプルかつ使いやすいUIを実現
+ */
 export function NotificationsPage() {
+  // 型付けされた通知データ
+  const notifications = mockNotifications as Notification[]
+
+  // 未読件数を集計
+  const unreadCount = notifications.filter(n => !n.readAt).length
+
+  /**
+   * 通知タイプごとにアイコンを返す
+   */
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'job_application': return <Users className="h-4 w-4" />
-      case 'job_submitted': return <CheckCircle className="h-4 w-4" />
-      case 'job_started': return <Clock className="h-4 w-4" />
-      case 'invoice_issued': return <FileText className="h-4 w-4" />
-      case 'job_rework_requested': return <AlertCircle className="h-4 w-4" />
-      case 'payment_received': return <CreditCard className="h-4 w-4" />
-      case 'job_cancelled': return <AlertCircle className="h-4 w-4" />
-      case 'worker_rating': return <Star className="h-4 w-4" />
-      case 'offer_accepted': return <CheckCircle className="h-4 w-4" />
-      default: return <Bell className="h-4 w-4" />
+      case 'job_application':
+        return <PeopleAltIcon />
+      case 'job_submitted':
+        return <CheckCircleIcon />
+      case 'job_started':
+        return <PlayArrowIcon />
+      case 'invoice_issued':
+        return <DescriptionIcon />
+      case 'job_rework_requested':
+        return <ErrorIcon />
+      case 'payment_received':
+        return <PaymentIcon />
+      case 'job_cancelled':
+        return <CancelIcon />
+      case 'worker_rating':
+        return <StarIcon />
+      case 'offer_accepted':
+        return <DoneIcon />
+      default:
+        return <NotificationsIcon />
     }
   }
 
-  const getNotificationColor = (type: string) => {
+  /**
+   * 通知タイプごとの色設定を返す
+   */
+  const getNotificationColors = (type: string) => {
     switch (type) {
-      case 'job_application': return 'bg-green-100 text-green-600'
-      case 'job_submitted': return 'bg-blue-100 text-blue-600'
-      case 'job_started': return 'bg-yellow-100 text-yellow-600'
-      case 'invoice_issued': return 'bg-purple-100 text-purple-600'
-      case 'job_rework_requested': return 'bg-red-100 text-red-600'
-      case 'payment_received': return 'bg-emerald-100 text-emerald-600'
-      case 'job_cancelled': return 'bg-orange-100 text-orange-600'
-      case 'worker_rating': return 'bg-amber-100 text-amber-600'
-      case 'offer_accepted': return 'bg-teal-100 text-teal-600'
-      default: return 'bg-gray-100 text-gray-600'
+      case 'job_application':
+        return { bg: 'success.light', color: 'success.main' }
+      case 'job_submitted':
+        return { bg: 'secondary.light', color: 'secondary.main' }
+      case 'job_started':
+        return { bg: 'warning.light', color: 'warning.main' }
+      case 'invoice_issued':
+        return { bg: 'info.light', color: 'info.main' }
+      case 'job_rework_requested':
+        return { bg: 'error.light', color: 'error.main' }
+      case 'payment_received':
+        return { bg: 'success.light', color: 'success.main' }
+      case 'job_cancelled':
+        return { bg: 'warning.light', color: 'warning.main' }
+      case 'worker_rating':
+        return { bg: 'secondary.light', color: 'secondary.main' }
+      case 'offer_accepted':
+        return { bg: 'success.light', color: 'success.main' }
+      default:
+        return { bg: 'grey.100', color: 'text.primary' }
     }
   }
 
+  /**
+   * 指定日時からの経過時間を「〜分前」の形式で返す
+   */
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
-    
-    if (diffInMinutes < 60) {
-      return `${diffInMinutes}分前`
-    } else if (diffInMinutes < 1440) {
-      return `${Math.floor(diffInMinutes / 60)}時間前`
-    } else {
-      return `${Math.floor(diffInMinutes / 1440)}日前`
+    if (diffInMinutes < 60) return `${diffInMinutes}分前`
+    const diffInHours = Math.floor(diffInMinutes / 60)
+    if (diffInHours < 24) return `${diffInHours}時間前`
+    const diffInDays = Math.floor(diffInHours / 24)
+    return `${diffInDays}日前`
+  }
+
+  /**
+   * 通知内容をタイプ別に整形して返す
+   */
+  const getNotificationMessage = (notification: Notification) => {
+    const { payload } = notification
+    switch (notification.type) {
+      case 'job_application':
+        return `${payload.workerName}さんが${payload.propertyName}の清掃案件に応募しました。`
+      case 'job_submitted':
+        return `${payload.workerName}さんが${payload.propertyName}の清掃を完了し、${payload.photosCount}枚の写真を提出しました。`
+      case 'job_started':
+        return `${payload.workerName}さんが${payload.propertyName}の清掃作業を開始しました。`
+      case 'invoice_issued':
+        return `${payload.period}の請求書（¥${payload.amount?.toLocaleString()}）が発行されました。`
+      case 'job_rework_requested':
+        return `${payload.propertyName}の清掃について再作業が必要です。理由: ${payload.reason}`
+      case 'payment_received':
+        return `請求書の支払い（¥${payload.amount?.toLocaleString()}）を${payload.paymentMethod}で受領しました。`
+      case 'worker_rating':
+        return `${payload.workerName}さんの作業評価をお願いします。（${payload.propertyName}）`
+      case 'job_cancelled':
+        return `${payload.propertyName}の案件がキャンセルされました。理由: ${payload.reason}`
+      case 'offer_accepted':
+        return `${payload.workerName}さんが${payload.propertyName}のオファーを承諾しました。`
+      default:
+        return ''
     }
   }
 
-  const unreadCount = mockNotifications.filter(n => !n.readAt).length
+  // サマリー表示用の件数集計
+  const summary = useMemo(
+    () => ({
+      unread: unreadCount,
+      application: notifications.filter(n => n.type === 'job_application').length,
+      submitted: notifications.filter(n => n.type === 'job_submitted').length,
+      billing: notifications.filter(n => ['invoice_issued', 'payment_received'].includes(n.type)).length,
+    }),
+    [notifications, unreadCount]
+  )
 
   return (
-    <PageContainer className="animate-fade-in">
-      {/* Page header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gradient">通知</h1>
-          <p className="text-muted-foreground mt-1">
+    <PageContainer>
+      {/* ページヘッダー */}
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Box>
+          <Typography variant="h4" fontWeight="bold">通知</Typography>
+          <Typography variant="body2" color="text.secondary">
             {unreadCount > 0 ? `${unreadCount}件の未読通知があります` : 'すべての通知を確認済みです'}
-          </p>
-        </div>
-        <div className="flex space-x-2">
-          <Button variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors">
-            <Filter className="mr-2 h-4 w-4" />
-            フィルター
-          </Button>
-          <Button variant="outline" className="hover:bg-secondary hover:text-secondary-foreground transition-colors">
-            <Check className="mr-2 h-4 w-4" />
-            すべて既読
-          </Button>
-        </div>
-      </div>
+          </Typography>
+        </Box>
+        <Box display="flex" gap={1}>
+          <Button variant="outlined" startIcon={<FilterListIcon />}>フィルター</Button>
+          <Button variant="outlined" startIcon={<DoneAllIcon />}>すべて既読</Button>
+        </Box>
+      </Box>
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-        <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-blue-700">未読</p>
-                <p className="text-2xl font-bold text-blue-900">{unreadCount}</p>
-              </div>
-              <div className="h-8 w-8 bg-blue-500 rounded-full flex items-center justify-center">
-                <Bell className="h-4 w-4 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-green-700">応募通知</p>
-                <p className="text-2xl font-bold text-green-900">{mockNotifications.filter(n => n.type === 'job_application').length}</p>
-              </div>
-              <div className="h-8 w-8 bg-green-500 rounded-full flex items-center justify-center">
-                <Users className="h-4 w-4 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-purple-700">作業完了</p>
-                <p className="text-2xl font-bold text-purple-900">{mockNotifications.filter(n => n.type === 'job_submitted').length}</p>
-              </div>
-              <div className="h-8 w-8 bg-purple-500 rounded-full flex items-center justify-center">
-                <CheckCircle className="h-4 w-4 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-emerald-700">請求・支払</p>
-                <p className="text-2xl font-bold text-emerald-900">{mockNotifications.filter(n => ['invoice_issued', 'payment_received'].includes(n.type)).length}</p>
-              </div>
-              <div className="h-8 w-8 bg-emerald-500 rounded-full flex items-center justify-center">
-                <CreditCard className="h-4 w-4 text-white" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="space-y-4">
-        {mockNotifications.map((notification, index) => (
-          <Card key={notification.id} className={`group transition-all duration-300 hover:shadow-xl hover:scale-[1.01] animate-slide-in border-0 shadow-md ${!notification.readAt ? 'border-l-4 border-l-blue-500 bg-blue-50/30' : ''}`} style={{ animationDelay: `${index * 50}ms` }}>
-            <CardHeader className="pb-3">
-              <div className="flex justify-between items-start">
-                <div className="flex items-start space-x-4 flex-1">
-                  <div className={`p-3 rounded-full ${getNotificationColor(notification.type)} group-hover:scale-110 transition-transform`}>
-                    {getNotificationIcon(notification.type)}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <CardTitle className="text-lg group-hover:text-primary transition-colors">
-                      {notification.title}
-                    </CardTitle>
-                    <div className="mt-2 space-y-1">
-                      {notification.type === 'job_application' && (
-                        <div className="text-sm text-muted-foreground">
-                          <p><span className="font-medium">{notification.payload.workerName}</span>さんが<span className="font-medium">{notification.payload.propertyName}</span>の清掃案件に応募しました。</p>
-                        </div>
-                      )}
-                      {notification.type === 'job_submitted' && (
-                        <div className="text-sm text-muted-foreground">
-                          <p><span className="font-medium">{notification.payload.workerName}</span>さんが<span className="font-medium">{notification.payload.propertyName}</span>の清掃を完了し、<span className="font-medium">{notification.payload.photosCount}枚</span>の写真を提出しました。</p>
-                        </div>
-                      )}
-                      {notification.type === 'job_started' && (
-                        <div className="text-sm text-muted-foreground">
-                          <p><span className="font-medium">{notification.payload.workerName}</span>さんが<span className="font-medium">{notification.payload.propertyName}</span>の清掃作業を開始しました。</p>
-                        </div>
-                      )}
-                      {notification.type === 'invoice_issued' && (
-                        <div className="text-sm text-muted-foreground">
-                          <p><span className="font-medium">{notification.payload.period}</span>の請求書（<span className="font-medium">¥{notification.payload.amount?.toLocaleString()}</span>）が発行されました。支払期限: {notification.payload.dueDate ? new Date(notification.payload.dueDate).toLocaleDateString('ja-JP') : '未定'}</p>
-                        </div>
-                      )}
-                      {notification.type === 'job_rework_requested' && (
-                        <div className="text-sm text-muted-foreground">
-                          <p><span className="font-medium">{notification.payload.propertyName}</span>の清掃について再作業が必要です。理由: {notification.payload.reason}</p>
-                        </div>
-                      )}
-                      {notification.type === 'payment_received' && (
-                        <div className="text-sm text-muted-foreground">
-                          <p>請求書の支払い（<span className="font-medium">¥{notification.payload.amount?.toLocaleString()}</span>）を{notification.payload.paymentMethod}で受領しました。</p>
-                        </div>
-                      )}
-                      {notification.type === 'worker_rating' && (
-                        <div className="text-sm text-muted-foreground">
-                          <p><span className="font-medium">{notification.payload.workerName}</span>さんの作業評価をお願いします。（{notification.payload.propertyName}）</p>
-                        </div>
-                      )}
-                      {notification.type === 'offer_accepted' && (
-                        <div className="text-sm text-muted-foreground">
-                          <p><span className="font-medium">{notification.payload.workerName}</span>さんが<span className="font-medium">{notification.payload.propertyName}</span>のオファーを承諾しました。</p>
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-3 flex items-center">
-                      <Clock className="h-3 w-3 mr-1" />
-                      {formatTimeAgo(notification.createdAt)}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex space-x-2 shrink-0">
-                  {!notification.readAt && (
-                    <Button size="sm" variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors">
-                      既読
-                    </Button>
-                  )}
-                  <Button size="sm" variant="outline" className="hover:bg-destructive hover:text-destructive-foreground transition-colors">
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
+      {/* サマリーカード */}
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card variant="outlined">
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="text.secondary">未読</Typography>
+                  <Typography variant="h5">{summary.unread}</Typography>
+                </Box>
+                <NotificationsIcon color="primary" />
+              </Box>
+            </CardContent>
           </Card>
-        ))}
-      </div>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card variant="outlined">
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="text.secondary">応募通知</Typography>
+                  <Typography variant="h5">{summary.application}</Typography>
+                </Box>
+                <PeopleAltIcon color="success" />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card variant="outlined">
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="text.secondary">作業完了</Typography>
+                  <Typography variant="h5">{summary.submitted}</Typography>
+                </Box>
+                <CheckCircleIcon color="secondary" />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card variant="outlined">
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="text.secondary">請求・支払</Typography>
+                  <Typography variant="h5">{summary.billing}</Typography>
+                </Box>
+                <PaymentIcon color="success" />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
 
-      <div className="text-center py-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-muted rounded-full mb-4">
-          <Check className="h-8 w-8 text-muted-foreground" />
-        </div>
-        <p className="text-muted-foreground">すべての通知を表示しました</p>
-      </div>
+      {/* 通知リスト */}
+      <List disablePadding>
+        {notifications.map(notification => {
+          const { bg, color } = getNotificationColors(notification.type)
+          return (
+            <ListItem
+              key={notification.id}
+              alignItems="flex-start"
+              sx={{
+                mb: 1,
+                borderRadius: 1,
+                bgcolor: notification.readAt ? 'background.paper' : 'action.hover',
+              }}
+              secondaryAction={
+                <Box display="flex" alignItems="center">
+                  {!notification.readAt && (
+                    <Button size="small">既読</Button>
+                  )}
+                  <IconButton edge="end">
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              }
+            >
+              <ListItemAvatar>
+                <Avatar sx={{ bgcolor: bg, color }}>
+                  {getNotificationIcon(notification.type)}
+                </Avatar>
+              </ListItemAvatar>
+              <ListItemText
+                primary={
+                  <Typography variant="subtitle1" fontWeight="bold">
+                    {notification.title}
+                    {!notification.readAt && (
+                      <Chip label="未読" color="primary" size="small" sx={{ ml: 1 }} />
+                    )}
+                  </Typography>
+                }
+                secondary={
+                  <>
+                    <Typography variant="body2" color="text.secondary">
+                      {getNotificationMessage(notification)}
+                    </Typography>
+                    <Typography variant="caption" color="text.disabled" mt={0.5} display="block">
+                      {formatTimeAgo(notification.createdAt)}
+                    </Typography>
+                  </>
+                }
+              />
+            </ListItem>
+          )
+        })}
+      </List>
+
+      {/* 最下部の案内メッセージ */}
+      <Box textAlign="center" py={4}>
+        <Typography variant="body2" color="text.secondary">
+          すべての通知を表示しました
+        </Typography>
+      </Box>
     </PageContainer>
   )
 }
