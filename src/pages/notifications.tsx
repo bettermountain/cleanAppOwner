@@ -2,7 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Bell, Check, Filter, Trash2, FileText, CreditCard, Star, AlertCircle, CheckCircle, Clock, Users } from 'lucide-react'
 import { mockNotifications } from '@/data/notifications'
+import { PageContainer } from '@/components/layout/page-container'
 
+// Notifications page lists system alerts for the owner
 export function NotificationsPage() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
@@ -51,7 +53,8 @@ export function NotificationsPage() {
   const unreadCount = mockNotifications.filter(n => !n.readAt).length
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <PageContainer className="animate-fade-in">
+      {/* Page header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gradient">通知</h1>
@@ -209,6 +212,6 @@ export function NotificationsPage() {
         </div>
         <p className="text-muted-foreground">すべての通知を表示しました</p>
       </div>
-    </div>
+    </PageContainer>
   )
 }

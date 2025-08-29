@@ -4,7 +4,9 @@ import { Input } from '@/components/ui/input'
 import { StatusBadge } from '@/components/common/status-badge'
 import { Plus, Search, Clock, Star, MessageSquare, Calendar, DollarSign, User, Filter, Send } from 'lucide-react'
 import { mockOffers } from '@/data/offers'
+import { PageContainer } from '@/components/layout/page-container'
 
+// Offers page manages direct job offers to workers
 export function OffersPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -29,7 +31,8 @@ export function OffersPage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <PageContainer className="animate-fade-in">
+      {/* Page header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gradient">指名オファー</h1>
@@ -236,6 +239,6 @@ export function OffersPage() {
           さらに表示
         </Button>
       </div>
-    </div>
+    </PageContainer>
   )
 }
