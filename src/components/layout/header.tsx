@@ -1,34 +1,48 @@
-import React from 'react'
-import { Bell, Search, User } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { AppBar, Toolbar, TextField, IconButton, Badge, Box } from '@mui/material'
+import { Search, Bell, User } from 'lucide-react'
 
 export function Header() {
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-      <div className="flex items-center flex-1 max-w-md">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            type="search"
+    <AppBar 
+      position="static" 
+      color="inherit" 
+      elevation={1}
+      sx={{ 
+        backgroundColor: 'background.paper',
+        borderBottom: 1,
+        borderColor: 'divider'
+      }}
+    >
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        <Box sx={{ maxWidth: 400, width: '100%' }}>
+          <TextField
+            size="small"
             placeholder="検索..."
-            className="pl-10 w-full"
+            variant="outlined"
+            fullWidth
+            InputProps={{
+              startAdornment: <Search size={16} style={{ marginRight: 8, color: '#757575' }} />,
+            }}
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'background.default',
+              },
+            }}
           />
-        </div>
-      </div>
-      
-      <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-            3
-          </span>
-        </Button>
+        </Box>
         
-        <Button variant="ghost" size="icon">
-          <User className="h-5 w-5" />
-        </Button>
-      </div>
-    </header>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <IconButton color="inherit">
+            <Badge badgeContent={3} color="error">
+              <Bell size={20} />
+            </Badge>
+          </IconButton>
+          
+          <IconButton color="inherit">
+            <User size={20} />
+          </IconButton>
+        </Box>
+      </Toolbar>
+    </AppBar>
   )
 }

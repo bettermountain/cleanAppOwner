@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
+import { Box } from '@mui/material'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
 import { LoginPage } from '@/pages/login'
@@ -20,11 +21,11 @@ function App() {
   }
 
   return (
-    <div className="h-screen flex bg-gray-50">
+    <Box sx={{ display: 'flex', height: '100vh' }}>
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
         <Header />
-        <main className="flex-1 overflow-auto">
+        <Box component="main" sx={{ flexGrow: 1, overflow: 'auto', p: 3 }}>
           <Routes>
             <Route path="/" element={<Navigate to="/properties" replace />} />
             <Route path="/login" element={<LoginPage />} />
@@ -38,9 +39,9 @@ function App() {
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
-        </main>
-      </div>
-    </div>
+        </Box>
+      </Box>
+    </Box>
   )
 }
 
