@@ -61,7 +61,6 @@ export function FavoriteStaffPage() {
           ),
         }}
       />
-
       {/* スタッフ情報を表形式で表示 */}
       <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table>
