@@ -1,3 +1,4 @@
+
 import { Container, Stack } from '@mui/material'
 // Import type separately so it doesn't inflate the runtime bundle
 import type { ContainerProps } from '@mui/material/Container'
