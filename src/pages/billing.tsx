@@ -119,56 +119,42 @@ export function BillingPage() {
 
       {/* --- サマリーカード ------------------------------------------------ */}
       <Grid container spacing={3}>
-        {/* 総売上 */}
+        {/* 総売上カード: シンプルな背景で統一感を出す */}
         <Grid item xs={12} md={6} lg={3}>
-          <Card
-            sx={{
-              background: 'linear-gradient(to bottom right, #E8F5E9, #C8E6C9)',
-            }}
-          >
+          <Card variant="outlined" sx={{ bgcolor: 'grey.50' }}>
             <CardContent>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
-                  <Typography variant="subtitle2" color="success.dark">
+                  <Typography variant="subtitle2" color="text.secondary">
                     総売上
                   </Typography>
                   <Typography variant="h5" fontWeight="bold">
                     ¥{totalRevenue.toLocaleString()}
                   </Typography>
-                  <Typography variant="caption" color="success.main">
+                  <Typography variant="caption" color="text.secondary">
                     +12.5% 前月比
                   </Typography>
                 </Box>
-                <TrendingUpIcon
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: 'success.main',
-                    p: 1,
-                    borderRadius: '50%',
-                  }}
-                />
+                {/* 売上増加を示すアイコン */}
+                <TrendingUpIcon color="success" />
               </Stack>
             </CardContent>
           </Card>
         </Grid>
-
-        {/* 未払い金額 */}
+        {/* 未払い金額カード */}
         <Grid item xs={12} md={6} lg={3}>
-          <Card
-            sx={{
-              background: 'linear-gradient(to bottom right, #E3F2FD, #BBDEFB)',
-            }}
-          >
+          <Card variant="outlined" sx={{ bgcolor: 'grey.50' }}>
             <CardContent>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
-                  <Typography variant="subtitle2" color="info.dark">
+                  <Typography variant="subtitle2" color="text.secondary">
+
                     未払い金額
                   </Typography>
                   <Typography variant="h5" fontWeight="bold">
                     ¥{unpaidAmount.toLocaleString()}
                   </Typography>
-                  <Typography variant="caption" color="info.main">
+                  <Typography variant="caption" color="text.secondary">
                     {
                       mockInvoices.filter(
                         (inv) => inv.status === 'issued' || inv.status === 'overdue',
@@ -177,81 +163,54 @@ export function BillingPage() {
                     件の請求書
                   </Typography>
                 </Box>
-                <AccessTimeIcon
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: 'info.main',
-                    p: 1,
-                    borderRadius: '50%',
-                  }}
-                />
+                {/* 支払待ちを示すアイコン */}
+                <AccessTimeIcon color="info" />
               </Stack>
             </CardContent>
           </Card>
         </Grid>
-
-        {/* 延滞金額 */}
+        {/* 延滞金額カード */}
         <Grid item xs={12} md={6} lg={3}>
-          <Card
-            sx={{
-              background: 'linear-gradient(to bottom right, #FFEBEE, #FFCDD2)',
-            }}
-          >
+          <Card variant="outlined" sx={{ bgcolor: 'grey.50' }}>
             <CardContent>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
-                  <Typography variant="subtitle2" color="error.dark">
+                  <Typography variant="subtitle2" color="text.secondary">
                     延滞金額
                   </Typography>
                   <Typography variant="h5" fontWeight="bold">
                     ¥{overdueAmount.toLocaleString()}
                   </Typography>
-                  <Typography variant="caption" color="error.main">
+                  <Typography variant="caption" color="text.secondary">
                     {mockInvoices.filter((inv) => inv.status === 'overdue').length}
                     件が延滞中
                   </Typography>
                 </Box>
-                <WarningAmberIcon
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: 'error.main',
-                    p: 1,
-                    borderRadius: '50%',
-                  }}
-                />
+                {/* 延滞注意を示すアイコン */}
+                <WarningAmberIcon color="error" />
               </Stack>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* 今月の案件数 */}
+        {/* 今月の案件数カード */}
         <Grid item xs={12} md={6} lg={3}>
-          <Card
-            sx={{
-              background: 'linear-gradient(to bottom right, #F3E5F5, #E1BEE7)',
-            }}
-          >
+          <Card variant="outlined" sx={{ bgcolor: 'grey.50' }}>
             <CardContent>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
-                  <Typography variant="subtitle2" color="secondary.dark">
+                  <Typography variant="subtitle2" color="text.secondary">
                     今月の案件数
                   </Typography>
                   <Typography variant="h5" fontWeight="bold">
                     {currentMonthJobs}
                   </Typography>
-                  <Typography variant="caption" color="secondary.main">
+                  <Typography variant="caption" color="text.secondary">
                     完了済み案件
                   </Typography>
                 </Box>
-                <CheckCircleIcon
-                  sx={{
-                    color: 'common.white',
-                    bgcolor: 'secondary.main',
-                    p: 1,
-                    borderRadius: '50%',
-                  }}
-                />
+                {/* 完了済み案件を示すアイコン */}
+                <CheckCircleIcon color="primary" />
               </Stack>
             </CardContent>
           </Card>
@@ -294,7 +253,13 @@ export function BillingPage() {
                         : '未払い'}
                     </TableCell>
                     <TableCell>
-                      <Chip size="small" label={statusProps.label} color={statusProps.color} />
+                      {/* ステータスを示す Chip は色を抑えるためアウトライン表示 */}
+                      <Chip
+                        size="small"
+                        label={statusProps.label}
+                        color={statusProps.color}
+                        variant="outlined"
+                      />
                     </TableCell>
                     <TableCell align="right">
                       <Stack direction="row" spacing={1} justifyContent="flex-end">
