@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+// Exporting component and style variants from the same file for convenience
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 

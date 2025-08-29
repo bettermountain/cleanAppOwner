@@ -5,8 +5,11 @@ import { StatusBadge } from '@/components/common/status-badge'
 import { Plus, Search, Calendar, Clock, MapPin, DollarSign, Users, Star, ArrowRight, Filter } from 'lucide-react'
 import { mockJobs } from '@/data/jobs'
 import { Link } from 'react-router-dom'
+import { PageContainer } from '@/components/layout/page-container'
 
+// Jobs page lists cleaning jobs with quick filters and stats
 export function JobsPage() {
+  // Map job status to card color accents
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'open': return 'bg-green-50 border-green-200'
@@ -26,7 +29,8 @@ export function JobsPage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <PageContainer className="animate-fade-in">
+      {/* Page header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gradient">案件管理</h1>
@@ -221,6 +225,6 @@ export function JobsPage() {
           さらに表示
         </Button>
       </div>
-    </div>
+    </PageContainer>
   )
 }

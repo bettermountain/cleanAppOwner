@@ -4,8 +4,11 @@ import { Input } from '@/components/ui/input'
 import { StatusBadge } from '@/components/common/status-badge'
 import { Download, Search, Calendar, Filter, FileText, CreditCard, TrendingUp, AlertTriangle, CheckCircle, Clock } from 'lucide-react'
 import { mockInvoices } from '@/data/invoices'
+import { PageContainer } from '@/components/layout/page-container'
 
+// Billing page shows invoice history and revenue summary
 export function BillingPage() {
+  // Calculate key invoice metrics for summary cards
   const totalRevenue = mockInvoices.filter(inv => inv.status === 'paid').reduce((sum, inv) => sum + inv.total, 0)
   const unpaidAmount = mockInvoices.filter(inv => ['issued', 'overdue'].includes(inv.status)).reduce((sum, inv) => sum + inv.total, 0)
   const overdueAmount = mockInvoices.filter(inv => inv.status === 'overdue').reduce((sum, inv) => sum + inv.total, 0)
@@ -23,7 +26,8 @@ export function BillingPage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <PageContainer className="animate-fade-in">
+      {/* Page header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gradient">請求・支払管理</h1>
@@ -206,6 +210,6 @@ export function BillingPage() {
           さらに表示
         </Button>
       </div>
-    </div>
+    </PageContainer>
   )
 }

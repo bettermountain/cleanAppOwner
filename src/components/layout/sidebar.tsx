@@ -1,6 +1,12 @@
-import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { cn } from '@/lib/utils'
+import {
+  Box,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+} from '@mui/material'
 import {
   Home,
   Building2,
@@ -25,39 +31,54 @@ const navigation = [
   { name: '設定', href: '/settings', icon: Settings },
 ]
 
+// Sidebar navigation using Material UI components for consistent styling
 export function Sidebar() {
   const location = useLocation()
 
   return (
-    <div className="flex h-full w-64 flex-col bg-white border-r border-gray-200">
-      <div className="flex h-16 items-center px-6 border-b border-gray-200">
-        <h1 className="text-xl font-semibold text-gray-900">CleanApp Owner</h1>
-      </div>
-      <nav className="flex-1 space-y-1 px-3 py-4">
+    <Box
+      component="nav"
+      sx={{
+        width: 256,
+        flexShrink: 0,
+        borderRight: 1,
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+      }}
+    >
+      {/* Application title */}
+      <Box sx={{ p: 3, borderBottom: 1, borderColor: 'divider' }}>
+        <Typography variant="h6">CleanApp Owner</Typography>
+      </Box>
+      <List>
         {navigation.map((item) => {
           const isActive = location.pathname === item.href
           return (
-            <Link
+            <ListItemButton
               key={item.name}
+              component={Link}
               to={item.href}
-              className={cn(
-                'group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
-                isActive
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              )}
+              selected={isActive}
+              // When selected, use theme colors to highlight the item
+              sx={{
+                '&.Mui-selected': {
+                  bgcolor: 'action.selected',
+                  color: 'primary.main',
+                  '& .MuiListItemIcon-root': { color: 'primary.main' },
+                },
+              }}
             >
-              <item.icon
-                className={cn(
-                  'mr-3 h-5 w-5 flex-shrink-0',
-                  isActive ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500'
-                )}
-              />
-              {item.name}
-            </Link>
+              <ListItemIcon>
+                <item.icon size={20} />
+              </ListItemIcon>
+              <ListItemText primary={item.name} />
+            </ListItemButton>
           )
         })}
-      </nav>
-    </div>
+      </List>
+    </Box>
   )
 }

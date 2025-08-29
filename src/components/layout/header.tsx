@@ -1,34 +1,54 @@
-import React from 'react'
-import { Bell, Search, User } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import AppBar from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import IconButton from '@mui/material/IconButton'
+import Badge from '@mui/material/Badge'
+import TextField from '@mui/material/TextField'
+import InputAdornment from '@mui/material/InputAdornment'
+import Box from '@mui/material/Box'
+import Avatar from '@mui/material/Avatar'
+import Tooltip from '@mui/material/Tooltip'
+import { Bell, Search } from 'lucide-react'
 
+// Responsive application header built with Material UI for a clean UX
 export function Header() {
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-      <div className="flex items-center flex-1 max-w-md">
-        <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            type="search"
-            placeholder="検索..."
-            className="pl-10 w-full"
-          />
-        </div>
-      </div>
-      
-      <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 rounded-full text-xs text-white flex items-center justify-center">
-            3
-          </span>
-        </Button>
-        
-        <Button variant="ghost" size="icon">
-          <User className="h-5 w-5" />
-        </Button>
-      </div>
-    </header>
+    <AppBar position="static" color="transparent" elevation={0} sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      {/* Toolbar arranges content horizontally and provides proper spacing */}
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        {/* Search input with icon adornment */}
+        <TextField
+          placeholder="検索..."
+          size="small"
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                {/* Lucide icon keeps visual consistency with rest of app */}
+                <Search size={18} />
+              </InputAdornment>
+            ),
+          }}
+          sx={{ width: '100%', maxWidth: 400, backgroundColor: 'background.paper', borderRadius: 1 }}
+        />
+
+        {/* Action buttons on the right side */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {/* Notification bell with badge indicating unread count */}
+          <Tooltip title="通知">
+            <IconButton color="inherit">
+              <Badge badgeContent={3} color="error">
+                <Bell size={20} />
+              </Badge>
+            </IconButton>
+          </Tooltip>
+
+          {/* Avatar represents current user; tooltip clarifies action */}
+          <Tooltip title="プロフィール">
+            <IconButton color="inherit">
+              <Avatar sx={{ width: 32, height: 32 }}>U</Avatar>
+            </IconButton>
+          </Tooltip>
+        </Box>
+      </Toolbar>
+    </AppBar>
   )
 }
