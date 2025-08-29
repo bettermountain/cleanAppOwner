@@ -4,7 +4,9 @@ import { Input } from '@/components/ui/input'
 import { StatusBadge } from '@/components/common/status-badge'
 import { Search, MapPin, Clock, User, Camera, CheckCircle, AlertCircle, Play, Pause, Filter, RefreshCw } from 'lucide-react'
 import { mockAssignments } from '@/data/assignments'
+import { PageContainer } from '@/components/layout/page-container'
 
+// Progress page monitors real-time cleaning assignments
 export function ProgressPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -47,7 +49,8 @@ export function ProgressPage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <PageContainer className="animate-fade-in">
+      {/* Page header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gradient">進捗モニター</h1>
@@ -277,6 +280,6 @@ export function ProgressPage() {
           さらに表示
         </Button>
       </div>
-    </div>
+    </PageContainer>
   )
 }

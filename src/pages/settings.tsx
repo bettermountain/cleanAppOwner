@@ -3,10 +3,13 @@ import { Settings as SettingsIcon, User, CreditCard, Link } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { PageContainer } from '@/components/layout/page-container'
 
+// Settings page for account and integration options
 export function SettingsPage() {
   return (
-    <div className="p-6">
+    <PageContainer>
+      {/* Page header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900">設定</h1>
         <p className="text-gray-600">アカウント設定と外部連携</p>
@@ -119,6 +122,6 @@ export function SettingsPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </PageContainer>
   )
 }
