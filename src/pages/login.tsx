@@ -4,7 +4,9 @@ import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Mail, Lock, Eye, EyeOff, Building2, Sparkles } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { Container } from '@mui/material'
 
+// Login page with animated gradient background and centered form
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [email, setEmail] = useState('')
@@ -28,7 +30,7 @@ export function LoginPage() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-green-400/20 to-blue-400/20 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="relative z-10 w-full max-w-md">
+      <Container maxWidth="sm" className="relative z-10">
         <div className="text-center mb-8 animate-fade-in">
           <div className="mx-auto h-16 w-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-lg">
             <Building2 className="h-8 w-8 text-white" />
@@ -147,7 +149,7 @@ export function LoginPage() {
         <div className="text-center mt-8 text-sm text-muted-foreground animate-fade-in" style={{ animationDelay: '300ms' }}>
           <p>© 2025 CleanApp Owner. すべての権利を保有します。</p>
         </div>
-      </div>
+      </Container>
     </div>
   )
 }

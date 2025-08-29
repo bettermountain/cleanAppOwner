@@ -5,7 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { StatusBadge } from '@/components/common/status-badge'
 import { formatCurrency } from '@/lib/utils'
+import { PageContainer } from '@/components/layout/page-container'
 
+// Job detail page shows a single job with application list
 export function JobDetailPage() {
   const { id } = useParams()
   
@@ -27,22 +29,22 @@ export function JobDetailPage() {
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{mockJob.propertyName}</h1>
-            <p className="text-gray-600 flex items-center mt-1">
-              <MapPin className="h-4 w-4 mr-1" />
-              {mockJob.address}
-            </p>
-          </div>
-          <StatusBadge status={mockJob.status} type="job" />
+    <PageContainer>
+      {/* Job overview */}
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">{mockJob.propertyName}</h1>
+          <p className="text-gray-600 flex items-center mt-1">
+            <MapPin className="h-4 w-4 mr-1" />
+            {mockJob.address}
+          </p>
         </div>
+        <StatusBadge status={mockJob.status} type="job" />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
+          {/* Details about the job itself */}
           <Card>
             <CardHeader>
               <CardTitle>依頼詳細</CardTitle>
@@ -112,6 +114,6 @@ export function JobDetailPage() {
           </Card>
         </div>
       </div>
-    </div>
+    </PageContainer>
   )
 }

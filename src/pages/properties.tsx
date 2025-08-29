@@ -3,10 +3,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Search, MapPin, Home, Users, Star, Calendar } from 'lucide-react'
 import { mockProperties } from '@/data/properties'
+import { PageContainer } from '@/components/layout/page-container'
 
+// Properties page manages registered rental properties
 export function PropertiesPage() {
   return (
-    <div className="space-y-6 animate-fade-in">
+    <PageContainer className="animate-fade-in">
+      {/* Page header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gradient">物件管理</h1>
@@ -98,6 +101,6 @@ export function PropertiesPage() {
           さらに表示
         </Button>
       </div>
-    </div>
+    </PageContainer>
   )
 }
