@@ -1,13 +1,13 @@
 import { Link, useLocation } from 'react-router-dom'
-import { 
-  Drawer, 
-  List, 
-  ListItem, 
-  ListItemButton, 
-  ListItemIcon, 
-  ListItemText, 
-  Typography, 
-  Box 
+import {
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography,
+  Box
 } from '@mui/material'
 import {
   Home,
@@ -84,7 +84,7 @@ export function Sidebar() {
             </ListItem>
           )
         })}
-      </nav>
-    </div>
+      </List>
+    </Drawer>
   )
 }
