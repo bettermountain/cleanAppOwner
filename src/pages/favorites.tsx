@@ -3,12 +3,16 @@ import {
   Avatar,
   Box,
   Button,
-  Card,
-  CardContent,
-  CardHeader,
   Chip,
-  Grid,
   InputAdornment,
+  Paper,
+  Rating,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from '@mui/material'
@@ -57,47 +61,73 @@ export function FavoriteStaffPage() {
           ),
         }}
       />
-
-      {/* スタッフカードのグリッド表示 */}
-      <Grid container spacing={2}>
-        {filteredWorkers.map((worker) => (
-          <Grid key={worker.id} item xs={12} md={6} lg={4}>
-            <Card variant="outlined" sx={{ height: '100%' }}>
-              <CardHeader
-                avatar={<Avatar src={worker.profileImage} alt={worker.name} />}
-                title={worker.name}
-                subheader={`評価 ${worker.rating.toFixed(1)} / 実績 ${worker.completedJobs}件`}
-              />
-              <CardContent>
-                {/* 専門分野表示 */}
-                <Typography variant="body2" color="text.secondary" mb={1}>
-                  専門分野
-                </Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                  {worker.specialties.map((spec) => (
-                    <Chip key={spec} label={spec} size="small" />
-                  ))}
-                </Box>
-
+      {/* スタッフ情報を表形式で表示 */}
+      <TableContainer component={Paper} sx={{ mt: 2 }}>
+        <Table>
+          {/* 表ヘッダー */}
+          <TableHead>
+            <TableRow>
+              <TableCell>スタッフ</TableCell>
+              <TableCell>評価 / 実績</TableCell>
+              <TableCell>専門分野</TableCell>
+              <TableCell align="right">操作</TableCell>
+            </TableRow>
+          </TableHead>
+          {/* 表ボディ */}
+          <TableBody>
+            {filteredWorkers.map((worker) => (
+              <TableRow key={worker.id} hover>
+                {/* スタッフ名とアイコン */}
+                <TableCell>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Avatar src={worker.profileImage} alt={worker.name} />
+                    <Typography fontWeight="bold">{worker.name}</Typography>
+                  </Box>
+                </TableCell>
+                {/* 評価と実績 */}
+                <TableCell>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Rating
+                      name={`rating-${worker.id}`}
+                      value={worker.rating}
+                      precision={0.1}
+                      size="small"
+                      readOnly
+                    />
+                    <Typography variant="body2" color="text.secondary">
+                      {worker.completedJobs}件
+                    </Typography>
+                  </Box>
+                </TableCell>
+                {/* 専門分野 */}
+                <TableCell>
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {worker.specialties.map((spec) => (
+                      <Chip key={spec} label={spec} size="small" />
+                    ))}
+                  </Box>
+                </TableCell>
                 {/* 操作ボタン */}
-                <Box mt={2} display="flex" justifyContent="flex-end" gap={1}>
-                  <Button size="small" variant="outlined">
-                    詳細
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="contained"
-                    color="error"
-                    startIcon={<FavoriteIcon />}
-                  >
-                    解除
-                  </Button>
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                <TableCell align="right">
+                  <Box display="flex" justifyContent="flex-end" gap={1}>
+                    <Button size="small" variant="outlined">
+                      詳細
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      color="error"
+                      startIcon={<FavoriteIcon />}
+                    >
+                      解除
+                    </Button>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </PageContainer>
   )
 }
