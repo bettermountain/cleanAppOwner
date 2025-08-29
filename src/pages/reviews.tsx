@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Search, Star, MessageSquare, Calendar, User, Camera, Filter, ThumbsUp } from 'lucide-react'
 import { mockReviews } from '@/data/reviews'
+import { PageContainer } from '@/components/layout/page-container'
 
+// Reviews page summarizes worker feedback and ratings
 export function ReviewsPage() {
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString)
@@ -38,7 +40,8 @@ export function ReviewsPage() {
   const averageRating = mockReviews.reduce((sum, review) => sum + review.rating, 0) / mockReviews.length
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <PageContainer className="animate-fade-in">
+      {/* Page header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gradient">レビュー・評価</h1>
@@ -226,6 +229,6 @@ export function ReviewsPage() {
           さらに表示
         </Button>
       </div>
-    </div>
+    </PageContainer>
   )
 }
