@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 // This file exports both the Button component and its style variants
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
