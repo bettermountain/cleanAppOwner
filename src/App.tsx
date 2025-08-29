@@ -6,7 +6,7 @@ import { LoginPage } from '@/pages/login'
 import { PropertiesPage } from '@/pages/properties'
 import { JobsPage } from '@/pages/jobs'
 import { JobDetailPage } from '@/pages/job-detail'
-import { OffersPage } from '@/pages/offers'
+import { FavoriteStaffPage } from '@/pages/favorites'
 import { ProgressPage } from '@/pages/progress'
 import { ReviewsPage } from '@/pages/reviews'
 import { BillingPage } from '@/pages/billing'
@@ -32,7 +32,7 @@ function App() {
             <Route path="/properties" element={<PropertiesPage />} />
             <Route path="/jobs" element={<JobsPage />} />
             <Route path="/jobs/:id" element={<JobDetailPage />} />
-            <Route path="/offers" element={<OffersPage />} />
+            <Route path="/favorites" element={<FavoriteStaffPage />} />
             <Route path="/progress" element={<ProgressPage />} />
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/billing" element={<BillingPage />} />
