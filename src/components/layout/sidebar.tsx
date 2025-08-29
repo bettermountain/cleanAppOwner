@@ -62,6 +62,14 @@ export function Sidebar() {
               component={Link}
               to={item.href}
               selected={isActive}
+              // When selected, use theme colors to highlight the item
+              sx={{
+                '&.Mui-selected': {
+                  bgcolor: 'action.selected',
+                  color: 'primary.main',
+                  '& .MuiListItemIcon-root': { color: 'primary.main' },
+                },
+              }}
             >
               <ListItemIcon>
                 <item.icon size={20} />
