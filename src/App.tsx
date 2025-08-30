@@ -28,7 +28,8 @@ function App() {
         <Header />
         <Box component="main" sx={{ flexGrow: 1, overflow: 'auto', p: 3 }}>
           <Routes>
-            <Route path="/" element={<Navigate to="/properties" replace />} />
+            {/* Dashboard displayed at root path */}
+            <Route path="/" element={<DashboardPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/properties" element={<PropertiesPage />} />
             <Route path="/jobs" element={<JobsPage />} />
