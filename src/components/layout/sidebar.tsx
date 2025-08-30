@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom';
 import {
   Drawer,
   List,
@@ -7,8 +7,8 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
-  Box
-} from '@mui/material'
+  Box,
+} from '@mui/material';
 import {
   Home,
   Building2,
@@ -18,8 +18,9 @@ import {
   Star,
   CreditCard,
   Bell,
+  Mail,
   Settings,
-} from 'lucide-react'
+} from 'lucide-react';
 
 const navigation = [
   { name: 'ダッシュボード', href: '/', icon: Home },
@@ -30,12 +31,13 @@ const navigation = [
   { name: 'レビュー', href: '/reviews', icon: Star },
   { name: '請求・支払', href: '/billing', icon: CreditCard },
   { name: '通知', href: '/notifications', icon: Bell },
+  { name: 'お問い合わせ', href: '/contact', icon: Mail },
   { name: '設定', href: '/settings', icon: Settings },
-]
+];
 
 // Sidebar navigation using Material UI components for consistent styling
 export function Sidebar() {
-  const location = useLocation()
+  const location = useLocation();
 
   return (
     <Drawer
@@ -56,8 +58,8 @@ export function Sidebar() {
       </Box>
       <List sx={{ pt: 2 }}>
         {navigation.map((item) => {
-          const isActive = location.pathname === item.href
-          const IconComponent = item.icon
+          const isActive = location.pathname === item.href;
+          const IconComponent = item.icon;
           return (
             <ListItem key={item.name} disablePadding sx={{ px: 1 }}>
               <ListItemButton
@@ -82,9 +84,9 @@ export function Sidebar() {
                 <ListItemText primary={item.name} />
               </ListItemButton>
             </ListItem>
-          )
+          );
         })}
       </List>
     </Drawer>
-  )
+  );
 }

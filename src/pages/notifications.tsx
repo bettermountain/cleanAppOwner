@@ -10,8 +10,8 @@ import {
   ListItemText,
   Paper,
   Tooltip,
-  Typography
-} from '@mui/material'
+  Typography,
+} from '@mui/material';
 import {
   AccessTime,
   Cancel,
@@ -22,48 +22,47 @@ import {
   Group,
   Payment,
   ReceiptLong,
-  Star
-} from '@mui/icons-material'
-import { mockNotifications } from '@/data/notifications'
-import { PageContainer } from '@/components/layout/page-container'
-import { mockNotifications } from '@/data/notifications'
-import type { Notification } from '@/schemas'
-
-// Single notification item type derived from mock data
-type Notification = (typeof mockNotifications)[number]
+  Star,
+} from '@mui/icons-material';
+import { mockNotifications } from '@/data/notifications';
+import { PageContainer } from '@/components/layout/page-container';
+import type { Notification } from '@/schemas';
 
 /**
  * オーナー向け通知一覧ページ
  * MUIコンポーネントを用いてシンプルで直感的なUIを構築します。
  */
 export function NotificationsPage() {
+  // モックデータを元に通知一覧と未読件数を計算
+  const notifications = mockNotifications;
+  const unreadCount = notifications.filter((n) => !n.readAt).length;
   /**
    * 通知タイプごとのアイコンを返すヘルパー
    */
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
       case 'job_application':
-        return <Group fontSize="small" />
+        return <Group fontSize="small" />;
       case 'job_submitted':
-        return <CheckCircle fontSize="small" />
+        return <CheckCircle fontSize="small" />;
       case 'job_started':
-        return <AccessTime fontSize="small" />
+        return <AccessTime fontSize="small" />;
       case 'invoice_issued':
-        return <ReceiptLong fontSize="small" />
+        return <ReceiptLong fontSize="small" />;
       case 'job_rework_requested':
-        return <Cancel fontSize="small" />
+        return <Cancel fontSize="small" />;
       case 'payment_received':
-        return <Payment fontSize="small" />
+        return <Payment fontSize="small" />;
       case 'job_cancelled':
-        return <Cancel fontSize="small" />
+        return <Cancel fontSize="small" />;
       case 'worker_rating':
-        return <Star fontSize="small" />
+        return <Star fontSize="small" />;
       case 'offer_accepted':
-        return <CheckCircle fontSize="small" />
+        return <CheckCircle fontSize="small" />;
       default:
-        return <AccessTime fontSize="small" />
+        return <AccessTime fontSize="small" />;
     }
-  }
+  };
 
   /**
    * 通知タイプに応じたアバター背景色を返す
@@ -71,40 +70,40 @@ export function NotificationsPage() {
   const getNotificationColor = (type: Notification['type']) => {
     switch (type) {
       case 'job_application':
-        return 'success.main'
+        return 'success.main';
       case 'job_submitted':
-        return 'info.main'
+        return 'info.main';
       case 'job_started':
-        return 'warning.main'
+        return 'warning.main';
       case 'invoice_issued':
-        return 'secondary.main'
+        return 'secondary.main';
       case 'job_rework_requested':
-        return 'error.main'
+        return 'error.main';
       case 'payment_received':
-        return 'success.dark'
+        return 'success.dark';
       case 'job_cancelled':
-        return 'error.main'
+        return 'error.main';
       case 'worker_rating':
-        return 'warning.dark'
+        return 'warning.dark';
       case 'offer_accepted':
-        return 'success.main'
+        return 'success.main';
       default:
-        return 'grey.500'
+        return 'grey.500';
     }
-  }
+  };
 
   /**
    * 相対時間表示を生成（例: "3分前"）
    */
   const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString)
-    const now = new Date()
-    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
 
-    if (diffInMinutes < 60) return `${diffInMinutes}分前`
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}時間前`
-    return `${Math.floor(diffInMinutes / 1440)}日前`
-  }
+    if (diffInMinutes < 60) return `${diffInMinutes}分前`;
+    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}時間前`;
+    return `${Math.floor(diffInMinutes / 1440)}日前`;
+  };
 
   return (
     <PageContainer>
@@ -133,7 +132,9 @@ export function NotificationsPage() {
       {/* ===== Summary cards ===== */}
       <Grid container spacing={2}>
         <Grid item xs={12} sm={3}>
-          <Paper sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Paper
+            sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          >
             <Box>
               <Typography variant="subtitle2" color="primary">
                 未読
@@ -144,39 +145,49 @@ export function NotificationsPage() {
           </Paper>
         </Grid>
         <Grid item xs={12} sm={3}>
-          <Paper sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Paper
+            sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          >
             <Box>
               <Typography variant="subtitle2" color="success">
                 応募通知
               </Typography>
               <Typography variant="h5">
-                {mockNotifications.filter(n => n.type === 'job_application').length}
+                {mockNotifications.filter((n) => n.type === 'job_application').length}
               </Typography>
             </Box>
             <Group color="success" />
           </Paper>
         </Grid>
         <Grid item xs={12} sm={3}>
-          <Paper sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Paper
+            sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          >
             <Box>
               <Typography variant="subtitle2" color="info">
                 作業完了
               </Typography>
               <Typography variant="h5">
-                {mockNotifications.filter(n => n.type === 'job_submitted').length}
+                {mockNotifications.filter((n) => n.type === 'job_submitted').length}
               </Typography>
             </Box>
             <CheckCircle color="info" />
           </Paper>
         </Grid>
         <Grid item xs={12} sm={3}>
-          <Paper sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Paper
+            sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+          >
             <Box>
               <Typography variant="subtitle2" color="secondary">
                 請求・支払
               </Typography>
               <Typography variant="h5">
-                {mockNotifications.filter(n => ['invoice_issued', 'payment_received'].includes(n.type)).length}
+                {
+                  mockNotifications.filter((n) =>
+                    ['invoice_issued', 'payment_received'].includes(n.type),
+                  ).length
+                }
               </Typography>
             </Box>
             <Payment color="secondary" />
@@ -186,12 +197,12 @@ export function NotificationsPage() {
 
       {/* ===== Notification list ===== */}
       <List sx={{ width: '100%' }}>
-        {mockNotifications.map(notification => (
+        {mockNotifications.map((notification) => (
           <Paper
             key={notification.id}
             sx={{
               mb: 2,
-              bgcolor: notification.readAt ? 'background.paper' : 'action.hover'
+              bgcolor: notification.readAt ? 'background.paper' : 'action.hover',
             }}
           >
             <ListItem
@@ -265,12 +276,14 @@ export function NotificationsPage() {
                     )}
                     {notification.type === 'payment_received' && (
                       <Typography variant="body2" color="text.secondary">
-                        請求書の支払い（¥{notification.payload.amount?.toLocaleString()}）を受領しました。
+                        請求書の支払い（¥{notification.payload.amount?.toLocaleString()}
+                        ）を受領しました。
                       </Typography>
                     )}
                     {notification.type === 'worker_rating' && (
                       <Typography variant="body2" color="text.secondary">
-                        <strong>{notification.payload.workerName}</strong>さんの作業評価をお願いします。
+                        <strong>{notification.payload.workerName}</strong>
+                        さんの作業評価をお願いします。
                       </Typography>
                     )}
                     {notification.type === 'offer_accepted' && (
@@ -301,6 +314,5 @@ export function NotificationsPage() {
         <Typography color="text.secondary">すべての通知を表示しました</Typography>
       </Box>
     </PageContainer>
-  )
+  );
 }
-
