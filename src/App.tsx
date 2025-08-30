@@ -1,23 +1,24 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
-import { Box } from '@mui/material'
-import { Sidebar } from '@/components/layout/sidebar'
-import { Header } from '@/components/layout/header'
-import { LoginPage } from '@/pages/login'
-import { PropertiesPage } from '@/pages/properties'
-import { JobsPage } from '@/pages/jobs'
-import { JobDetailPage } from '@/pages/job-detail'
-import { FavoriteStaffPage } from '@/pages/favorites'
-import { ProgressPage } from '@/pages/progress'
-import { ReviewsPage } from '@/pages/reviews'
-import { BillingPage } from '@/pages/billing'
-import { NotificationsPage } from '@/pages/notifications'
-import { SettingsPage } from '@/pages/settings'
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { Box } from '@mui/material';
+import { Sidebar } from '@/components/layout/sidebar';
+import { Header } from '@/components/layout/header';
+import { LoginPage } from '@/pages/login';
+import { PropertiesPage } from '@/pages/properties';
+import { JobsPage } from '@/pages/jobs';
+import { JobDetailPage } from '@/pages/job-detail';
+import { FavoriteStaffPage } from '@/pages/favorites';
+import { ProgressPage } from '@/pages/progress';
+import { ReviewsPage } from '@/pages/reviews';
+import { BillingPage } from '@/pages/billing';
+import { NotificationsPage } from '@/pages/notifications';
+import { SettingsPage } from '@/pages/settings';
+import { ContactPage } from '@/pages/contact';
 
 function App() {
-  const isAuthenticated = localStorage.getItem('auth_token')
+  const isAuthenticated = localStorage.getItem('auth_token');
 
   if (!isAuthenticated) {
-    return <LoginPage />
+    return <LoginPage />;
   }
 
   return (
@@ -37,12 +38,13 @@ function App() {
             <Route path="/reviews" element={<ReviewsPage />} />
             <Route path="/billing" element={<BillingPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="/settings" element={<SettingsPage />} />
           </Routes>
         </Box>
       </Box>
     </Box>
-  )
+  );
 }
 
-export default App
+export default App;
