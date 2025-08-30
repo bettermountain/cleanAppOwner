@@ -1,8 +1,9 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { Box } from '@mui/material'
 import { Sidebar } from '@/components/layout/sidebar'
 import { Header } from '@/components/layout/header'
 import { LoginPage } from '@/pages/login'
+import { DashboardPage } from '@/pages/dashboard'
 import { PropertiesPage } from '@/pages/properties'
 import { JobsPage } from '@/pages/jobs'
 import { JobDetailPage } from '@/pages/job-detail'
@@ -27,7 +28,8 @@ function App() {
         <Header />
         <Box component="main" sx={{ flexGrow: 1, overflow: 'auto', p: 3 }}>
           <Routes>
-            <Route path="/" element={<Navigate to="/properties" replace />} />
+            {/* Dashboard displayed at root path */}
+            <Route path="/" element={<DashboardPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/properties" element={<PropertiesPage />} />
             <Route path="/jobs" element={<JobsPage />} />

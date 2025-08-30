@@ -106,17 +106,6 @@ export function NotificationsPage() {
     return `${Math.floor(diffInMinutes / 1440)}日前`
   }
 
-  // サマリー表示用の件数集計
-  const summary = useMemo(
-    () => ({
-      unread: unreadCount,
-      application: notifications.filter(n => n.type === 'job_application').length,
-      submitted: notifications.filter(n => n.type === 'job_submitted').length,
-      billing: notifications.filter(n => ['invoice_issued', 'payment_received'].includes(n.type)).length,
-    }),
-    [notifications, unreadCount]
-  )
-
   return (
     <PageContainer>
       {/* ===== Header with actions ===== */}
