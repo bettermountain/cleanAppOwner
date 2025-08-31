@@ -14,7 +14,7 @@ export const muiTheme = createTheme({
       dark: '#7b1fa2',
     },
     background: {
-      default: '#f5f5f5',
+      default: '#ffffff',
       paper: '#ffffff',
     },
     text: {

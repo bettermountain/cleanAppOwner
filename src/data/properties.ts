@@ -2,6 +2,7 @@ export const mockProperties = [
   {
     id: "prop-1",
     name: "渋谷モダンアパートメント",
+    publicName: "渋谷モダンアパートメント（公開）",
     address: "東京都渋谷区道玄坂2-10-12",
     accessNote: "JR渋谷駅ハチ公口から徒歩5分。1階にファミリーマートがあるビルの3階です。",
     doorCode: "1234",
@@ -18,6 +19,7 @@ export const mockProperties = [
   {
     id: "prop-2",
     name: "新宿高層マンション",
+    publicName: "新宿高層マンション（公開）",
     address: "東京都新宿区西新宿1-26-2",
     accessNote: "JR新宿駅南口から徒歩3分。高層マンション25階、エレベーターで直接アクセス。",
     doorCode: "5678",
@@ -34,6 +36,7 @@ export const mockProperties = [
   {
     id: "prop-3",
     name: "浅草伝統的町家",
+    publicName: "浅草伝統的町家（公開）",
     address: "東京都台東区浅草2-3-1",
     accessNote: "東京メトロ銀座線浅草駅から徒歩7分。雷門から徒歩3分の伝統的な町家です。",
     doorCode: "9012",
@@ -50,6 +53,7 @@ export const mockProperties = [
   {
     id: "prop-4",
     name: "銀座ラグジュアリースイート",
+    publicName: "銀座ラグジュアリースイート（公開）",
     address: "東京都中央区銀座4-6-16",
     accessNote: "東京メトロ銀座駅A6出口から徒歩2分。銀座の中心部にある高級スイートルーム。",
     doorCode: "3456",
@@ -66,6 +70,7 @@ export const mockProperties = [
   {
     id: "prop-5",
     name: "原宿ファミリーハウス",
+    publicName: "原宿ファミリーハウス（公開）",
     address: "東京都渋谷区神宮前4-26-28",
     accessNote: "JR原宿駅表参道口から徒歩8分。明治神宮前駅から徒歩5分。静かな住宅街にあります。",
     doorCode: "7890",
@@ -82,6 +87,7 @@ export const mockProperties = [
   {
     id: "prop-6",
     name: "上野アートロフト",
+    publicName: "上野アートロフト（公開）",
     address: "東京都台東区上野7-1-1",
     accessNote: "JR上野駅公園口から徒歩5分。上野公園に近く、美術館巡りに最適な立地。",
     doorCode: "2468",
@@ -98,6 +104,7 @@ export const mockProperties = [
   {
     id: "prop-7",
     name: "六本木ヒルズビュー",
+    publicName: "六本木ヒルズビュー（公開）",
     address: "東京都港区六本木6-10-1",
     accessNote: "東京メトロ日比谷線六本木駅1C出口から徒歩3分。六本木ヒルズが一望できます。",
     doorCode: "1357",
@@ -114,6 +121,7 @@ export const mockProperties = [
   {
     id: "prop-8",
     name: "築地市場近くの和室",
+    publicName: "築地市場近くの和室（公開）",
     address: "東京都中央区築地3-15-1",
     accessNote: "東京メトロ日比谷線築地駅から徒歩4分。築地場外市場まで徒歩2分。",
     doorCode: "9753",

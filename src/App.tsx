@@ -2,8 +2,10 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
+import { useState } from 'react';
 import { LoginPage } from '@/pages/login';
 import { PropertiesPage } from '@/pages/properties';
+import { PropertyNewPage } from '@/pages/property-new';
 import { JobsPage } from '@/pages/jobs';
 import { JobDetailPage } from '@/pages/job-detail';
 import { FavoriteStaffPage } from '@/pages/favorites';
@@ -13,25 +15,38 @@ import { BillingPage } from '@/pages/billing';
 import { NotificationsPage } from '@/pages/notifications';
 import { SettingsPage } from '@/pages/settings';
 import { ContactPage } from '@/pages/contact';
+import { DashboardPage } from '@/pages/dashboard';
+
+const drawerWidth = 256;
 
 function App() {
   const isAuthenticated = localStorage.getItem('auth_token');
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   if (!isAuthenticated) {
     return <LoginPage />;
   }
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh' }}>
-      <Sidebar />
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <Header />
-        <Box component="main" sx={{ flexGrow: 1, overflow: 'auto', p: 3 }}>
+    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+      <Sidebar mobileOpen={mobileOpen} onClose={() => setMobileOpen(false)} drawerWidth={drawerWidth} />
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          ml: { sm: `${drawerWidth}px` },
+        }}
+      >
+        {/* <Header onMenuClick={() => setMobileOpen(true)} /> */}
+        <Box component="main" sx={{ flexGrow: 1, overflow: 'auto', p: { xs: 2, sm: 3 } }}>
           <Routes>
             {/* Dashboard displayed at root path */}
             <Route path="/" element={<DashboardPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/properties" element={<PropertiesPage />} />
+            <Route path="/properties/new" element={<PropertyNewPage />} />
             <Route path="/jobs" element={<JobsPage />} />
             <Route path="/jobs/:id" element={<JobDetailPage />} />
             <Route path="/favorites" element={<FavoriteStaffPage />} />

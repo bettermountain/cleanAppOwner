@@ -1,11 +1,15 @@
 import { AppBar, Toolbar, TextField, IconButton, Badge, Box } from '@mui/material'
-import { Search, Bell, User } from 'lucide-react'
+import { Search, Bell, User, Menu } from 'lucide-react'
+
+type HeaderProps = {
+  onMenuClick?: () => void
+}
 
 // Responsive application header built with Material UI for a clean UX
-export function Header() {
+export function Header({ onMenuClick }: HeaderProps) {
   return (
     <AppBar 
-      position="static" 
+      position="sticky" 
       color="inherit" 
       elevation={1}
       sx={{ 
@@ -14,8 +18,15 @@ export function Header() {
         borderColor: 'divider'
       }}
     >
-      <Toolbar sx={{ justifyContent: 'space-between' }}>
-        <Box sx={{ maxWidth: 400, width: '100%' }}>
+      <Toolbar sx={{ justifyContent: 'space-between', gap: 1 }}>
+        {/* Mobile menu button */}
+        <Box sx={{ display: { xs: 'flex', sm: 'none' } }}>
+          <IconButton color="inherit" onClick={onMenuClick} aria-label="open navigation">
+            <Menu size={20} />
+          </IconButton>
+        </Box>
+
+        <Box sx={{ maxWidth: { xs: 220, sm: 400 }, width: '100%' }}>
           <TextField
             size="small"
             placeholder="検索..."
@@ -28,6 +39,7 @@ export function Header() {
               '& .MuiOutlinedInput-root': {
                 backgroundColor: 'background.default',
               },
+              display: { xs: 'none', sm: 'block' }
             }}
           />
         </Box>
