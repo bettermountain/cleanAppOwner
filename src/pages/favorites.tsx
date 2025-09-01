@@ -13,6 +13,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
   TextField,
   Typography,
 } from '@mui/material'
@@ -28,11 +29,14 @@ import { PageContainer } from '@/components/layout/page-container'
 export function FavoriteStaffPage() {
   // 検索キーワードの状態を管理
   const [query, setQuery] = useState('')
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
 
   // 名前でスタッフをフィルタリング
   const filteredWorkers = mockWorkers.filter((worker) =>
     worker.name.includes(query)
   )
+  const paginated = filteredWorkers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
 
   return (
     <PageContainer>
@@ -75,7 +79,7 @@ export function FavoriteStaffPage() {
           </TableHead>
           {/* 表ボディ */}
           <TableBody>
-            {filteredWorkers.map((worker) => (
+            {paginated.map((worker) => (
               <TableRow key={worker.id} hover>
                 {/* スタッフ名とアイコン */}
                 <TableCell>
@@ -127,6 +131,16 @@ export function FavoriteStaffPage() {
             ))}
           </TableBody>
         </Table>
+        <TablePagination
+          component="div"
+          count={filteredWorkers.length}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0) }}
+          rowsPerPageOptions={[10, 25, 50]}
+          labelRowsPerPage="1ページあたり"
+        />
       </TableContainer>
     </PageContainer>
   )

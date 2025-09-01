@@ -9,7 +9,6 @@ import {
   Typography,
   Button,
   Divider,
-  Autocomplete,
   ToggleButtonGroup,
   ToggleButton,
   Switch,
@@ -25,6 +24,7 @@ import DoorFrontIcon from '@mui/icons-material/DoorFront'
 import { PageContainer } from '@/components/layout/page-container'
 import { mockProperties } from '@/data/properties'
 import AppTextField from '@/components/common/app-text-field'
+import AppSelect from '@/components/common/app-select'
 
 const schema = z.object({
   propertyId: z.string().min(1, '物件を選択してください'),
@@ -68,6 +68,8 @@ export function JobNewPage() {
     },
   })
 
+  // テンプレートからの自動入力機能は不要のため削除済み
+
   const selectedProperty = React.useMemo(
     () => mockProperties.find((p) => p.id === watch('propertyId')) || null,
     [watch('propertyId')]
@@ -82,6 +84,21 @@ export function JobNewPage() {
 
   const SectionTitle = ({ children }: { children: React.ReactNode }) => (
     <Typography variant="h6" fontWeight={700} sx={{ mb: 1 }}>{children}</Typography>
+  )
+
+  const Field = ({
+    label,
+    caption,
+    maxWidth,
+    children,
+  }: { label: string; caption?: string; maxWidth?: number | string; children: React.ReactNode }) => (
+    <Box sx={{ maxWidth: maxWidth ?? '100%' }}>
+      <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>{label}</Typography>
+      {caption && (
+        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>{caption}</Typography>
+      )}
+      {children}
+    </Box>
   )
 
   return (
@@ -101,44 +118,14 @@ export function JobNewPage() {
         <Box sx={{ mb: 2 }}>
           <SectionTitle>物件を選択</SectionTitle>
           <Box sx={{ p: 0 }}>
-            <Typography variant="body2" fontWeight={600} sx={{ mb: 0.5 }}>物件</Typography>
-            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-              対象となる物件を検索して選択
-            </Typography>
-            <Controller
-              name="propertyId"
-              control={control}
-              render={({ field }) => (
-                <Autocomplete
-                  value={mockProperties.find((p) => p.id === field.value) || null}
-                  onChange={(_, v) => field.onChange(v?.id ?? '')}
-                  options={mockProperties}
-                  getOptionLabel={(o) => o.name}
-                  isOptionEqualToValue={(a, b) => a.id === b.id}
-                  renderOption={(props, option) => (
-                    <Box component="li" {...props} key={option.id} sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Box component="img" src={option.imageUrl} alt={option.name} sx={{ width: 40, height: 40, borderRadius: 1, objectFit: 'cover' }} />
-                      <Box>
-                        <Typography variant="body2" fontWeight={600}>{option.name}</Typography>
-                        <Typography variant="caption" color="text.secondary">{option.address}</Typography>
-                      </Box>
-                    </Box>
-                  )}
-                  renderInput={(params) => (
-                    <div ref={params.InputProps.ref as React.Ref<HTMLDivElement>}>
-                      <input
-                        {...params.inputProps}
-                        placeholder="物件名で検索"
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      />
-                    </div>
-                  )}
-                />
-              )}
-            />
-            {errors.propertyId?.message && (
-              <Typography variant="caption" color="error">{errors.propertyId.message}</Typography>
-            )}
+            <Field label="物件" caption="対象となる物件を選択" maxWidth={480}>
+              <AppSelect
+                placeholder="選択してください"
+                options={mockProperties.map((p) => ({ value: p.id, label: p.name }))}
+                {...register('propertyId')}
+                error={errors.propertyId?.message}
+              />
+            </Field>
 
             {selectedProperty && (
               <Box mt={2} display="flex" gap={2} alignItems="center">
@@ -158,37 +145,16 @@ export function JobNewPage() {
         <Box sx={{ mb: 2 }}>
           <SectionTitle>スケジュール</SectionTitle>
           <Box sx={{ p: 0 }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-              <AppTextField
-                type="date"
-                label="日付"
-                description="作業予定の日付"
-                requiredMark
-                {...register('jobDate')}
-                error={errors.jobDate?.message}
-                containerClassName="min-w-[220px]"
-                prefix={<CalendarMonthIcon fontSize="small" />}
-              />
-              <AppTextField
-                type="time"
-                label="開始時間"
-                description="作業開始の時刻"
-                requiredMark
-                {...register('startTime')}
-                error={errors.startTime?.message}
-                containerClassName="min-w-[220px]"
-                prefix={<AccessTimeIcon fontSize="small" />}
-              />
-              <AppTextField
-                type="number"
-                label="想定時間（時間）"
-                description="だいたいの作業時間"
-                placeholder="例: 3"
-                step={0.5}
-                min={0.5}
-                {...register('expectedHours', { valueAsNumber: true })}
-                containerClassName="min-w-[200px]"
-              />
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="flex-start">
+              <Field label="日付" caption="作業予定の日付" maxWidth={220}>
+                <AppTextField type="date" {...register('jobDate')} error={errors.jobDate?.message} prefix={<CalendarMonthIcon fontSize="small" />} />
+              </Field>
+              <Field label="開始時間" caption="作業開始の時刻" maxWidth={220}>
+                <AppTextField type="time" {...register('startTime')} error={errors.startTime?.message} prefix={<AccessTimeIcon fontSize="small" />} />
+              </Field>
+              <Field label="想定時間（時間）" caption="だいたいの作業時間" maxWidth={200}>
+                <AppTextField type="number" placeholder="例: 3" step={0.5} min={0.5} {...register('expectedHours', { valueAsNumber: true })} />
+              </Field>
             </Stack>
           </Box>
         </Box>
@@ -199,38 +165,19 @@ export function JobNewPage() {
         <Box sx={{ mb: 2 }}>
           <SectionTitle>条件</SectionTitle>
           <Box sx={{ p: 0 }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }}>
-              <AppTextField
-                type="number"
-                label="次の宿泊人数"
-                description="次回宿泊の予定人数"
-                placeholder="例: 2"
-                min={1}
-                step={1}
-                requiredMark
-                {...register('nextGuests', { valueAsNumber: true })}
-                error={errors.nextGuests?.message}
-                containerClassName="min-w-[200px]"
-                prefix={<PeopleIcon fontSize="small" />}
-              />
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'flex-start' }}>
+              <Field label="次の宿泊人数" caption="次回宿泊の予定人数" maxWidth={200}>
+                <AppTextField type="number" placeholder="例: 2" min={1} step={1} {...register('nextGuests', { valueAsNumber: true })} error={errors.nextGuests?.message} prefix={<PeopleIcon fontSize="small" />} />
+              </Field>
               <FormControlLabel
                 control={<Controller name="needsCheckIn" control={control} render={({ field }) => (
                   <Switch checked={field.value} onChange={(_, v) => field.onChange(v)} />
                 )} />}
                 label={<Box display="flex" alignItems="center" gap={0.5}><DoorFrontIcon color="action" fontSize="small" />インあり</Box>}
               />
-              <AppTextField
-                type="number"
-                label="求人人数"
-                description="募集する人数"
-                placeholder="例: 1"
-                min={1}
-                step={1}
-                requiredMark
-                {...register('requiredWorkers', { valueAsNumber: true })}
-                error={errors.requiredWorkers?.message}
-                containerClassName="min-w-[200px]"
-              />
+              <Field label="求人人数" caption="募集する人数" maxWidth={200}>
+                <AppTextField type="number" placeholder="例: 1" min={1} step={1} {...register('requiredWorkers', { valueAsNumber: true })} error={errors.requiredWorkers?.message} />
+              </Field>
             </Stack>
           </Box>
         </Box>
@@ -241,42 +188,37 @@ export function JobNewPage() {
         <Box sx={{ mb: 8 }}>
           <SectionTitle>報酬を設定</SectionTitle>
           <Box sx={{ p: 0 }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'center' }}>
-              <Controller
-                name="payType"
-                control={control}
-                render={({ field }) => (
-                  <ToggleButtonGroup
-                    exclusive
-                    value={field.value}
-                    onChange={(_, v) => v && field.onChange(v)}
-                    size="small"
-                  >
-                    <ToggleButton value="fixed">固定</ToggleButton>
-                    <ToggleButton value="hourly">時給</ToggleButton>
-                  </ToggleButtonGroup>
-                )}
-              />
-              <AppTextField
-                type="number"
-                label="金額"
-                description="支払う報酬額"
-                placeholder="例: 10000"
-                min={0}
-                step={100}
-                requiredMark
-                {...register('payAmount', { valueAsNumber: true })}
-                error={errors.payAmount?.message}
-                containerClassName="min-w-[220px]"
-                prefix={<AttachMoneyIcon fontSize="small" />}
-                suffix={watch('payType') === 'hourly' ? '円/時' : '円'}
-              />
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ xs: 'stretch', sm: 'flex-start' }}>
+              <Field label="報酬タイプ" maxWidth={200}>
+                <Controller
+                  name="payType"
+                  control={control}
+                  render={({ field }) => (
+                    <ToggleButtonGroup exclusive value={field.value} onChange={(_, v) => v && field.onChange(v)} size="small">
+                      <ToggleButton value="fixed">固定</ToggleButton>
+                      <ToggleButton value="hourly">時給</ToggleButton>
+                    </ToggleButtonGroup>
+                  )}
+                />
+              </Field>
+              <Field label="金額" caption="支払う報酬額" maxWidth={220}>
+                <AppTextField
+                  type="number"
+                  placeholder="例: 10000"
+                  min={0}
+                  step={100}
+                  {...register('payAmount', { valueAsNumber: true })}
+                  error={errors.payAmount?.message}
+                  prefix={<AttachMoneyIcon fontSize="small" />}
+                  suffix={watch('payType') === 'hourly' ? '円/時' : '円'}
+                />
+              </Field>
             </Stack>
           </Box>
         </Box>
 
         {/* Sticky action bar */}
-        <Box sx={{ position: 'sticky', bottom: 0, p: 2, display: 'flex', gap: 1, justifyContent: 'flex-end', alignItems: 'center', bgcolor: 'background.paper', borderTop: '1px solid', borderColor: 'divider' }}>
+        <Box sx={{ position: 'sticky', bottom: 0, p: 2, display: 'flex', gap: 1, justifyContent: { xs: 'stretch', sm: 'flex-end' }, alignItems: 'center', bgcolor: 'background.paper', borderTop: '1px solid', borderColor: 'divider', flexWrap: 'wrap' }}>
           <Button component={RouterLink} to="/jobs" color="inherit">キャンセル</Button>
           <Button type="button" variant="outlined" onClick={() => {/* 下書き保存の実装余地 */}}>下書き保存</Button>
           <Button type="submit" variant="contained" disabled={isSubmitting}>公開する</Button>

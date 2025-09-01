@@ -13,6 +13,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  TablePagination,
   ButtonGroup,
   Menu,
   MenuItem,
@@ -127,6 +128,10 @@ function ActionSplitButton({ propertyId }: { propertyId: string }) {
 
 // 物件管理ページ: 登録済み物件を表形式で表示
 export function PropertiesPage() {
+  const [page, setPage] = React.useState(0)
+  const [rowsPerPage, setRowsPerPage] = React.useState(10)
+  const paginated = mockProperties.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+
   return (
     <PageContainer>
       {/* ページヘッダー */}
@@ -142,8 +147,8 @@ export function PropertiesPage() {
         <Button component={RouterLink} to="/properties/new" variant="contained" startIcon={<Plus size={20} />}>物件登録</Button>
       </Box>
 
-      {/* 検索バーと地図表示ボタン */}
-      <Paper sx={{ p: 2 }}>
+      {/* 検索バーと地図表示ボタン（カードなし） */}
+      <Box sx={{ my: 2 }}>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
           <TextField
             fullWidth
@@ -160,11 +165,11 @@ export function PropertiesPage() {
           />
           <Button variant="outlined" startIcon={<MapPin size={16} />}>地図表示</Button>
         </Box>
-      </Paper>
+      </Box>
 
       {/* 物件一覧テーブル */}
-      <TableContainer component={Paper} sx={{ overflowX: 'auto' }}>
-        <Table>
+      <TableContainer component={Paper} sx={{ overflowX: 'auto', width: '100%' }}>
+        <Table sx={{ minWidth: 720 }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: 'grey.100' }}>
               <TableCell>物件名</TableCell>
@@ -174,7 +179,7 @@ export function PropertiesPage() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {mockProperties.map((property) => (
+            {paginated.map((property) => (
               <TableRow key={property.id} hover>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -204,12 +209,17 @@ export function PropertiesPage() {
             ))}
           </TableBody>
         </Table>
+        <TablePagination
+          component="div"
+          count={mockProperties.length}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0) }}
+          rowsPerPageOptions={[10, 25, 50]}
+          labelRowsPerPage="1ページあたり"
+        />
       </TableContainer>
-
-      {/* さらに表示ボタン */}
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <Button variant="outlined">さらに表示</Button>
-      </Box>
     </PageContainer>
   )
 }

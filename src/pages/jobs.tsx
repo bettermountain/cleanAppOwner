@@ -15,8 +15,6 @@ import {
   Paper,
   Tabs,
   Tab,
-  ToggleButton,
-  ToggleButtonGroup,
   FormControl,
   InputLabel,
   Select,
@@ -27,37 +25,59 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  ButtonGroup,
+  Menu,
+  Divider,
+  TablePagination,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material'
 
 import {
   Add as AddIcon,
   Search as SearchIcon,
   CalendarMonth as CalendarMonthIcon,
-  AccessTime as AccessTimeIcon,
   Place as PlaceIcon,
   AttachMoney as AttachMoneyIcon,
   Star as StarIcon,
 } from '@mui/icons-material'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
+import EditIcon from '@mui/icons-material/Edit'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn'
+import { useNavigate } from 'react-router-dom'
 
-type Density = 'comfortable' | 'compact'
+type JobStatus =
+  | 'open'
+  | 'assigned'
+  | 'in_progress'
+  | 'submitted'
+  | 'completed'
+  | 'approved'
+  | 'cancelled'
+  | 'draft'
+  | 'rework'
 
 // Jobs page redesigned with Material UI for a minimal, information-first layout
 export function JobsPage() {
+  const [jobs, setJobs] = useState(mockJobs)
   const [query, setQuery] = useState('')
   const [tab, setTab] = useState<'all' | 'open' | 'progress' | 'submitted' | 'done'>('all')
   const [from, setFrom] = useState('') // YYYY-MM-DD
   const [to, setTo] = useState('')
   const [sort, setSort] = useState<'date_desc' | 'date_asc' | 'pay_desc' | 'pay_asc'>('date_desc')
-  const [density, setDensity] = useState<Density>('comfortable')
+  // 常にコンパクト表示
 
   const getPayTypeLabel = (payType: string) => (payType === 'hourly' ? '時給' : '固定')
 
   const counts = useMemo(() => ({
-    open: mockJobs.filter((j) => j.status === 'open').length,
-    progress: mockJobs.filter((j) => ['assigned', 'in_progress'].includes(j.status)).length,
-    submitted: mockJobs.filter((j) => j.status === 'submitted').length,
-    done: mockJobs.filter((j) => ['completed', 'approved'].includes(j.status)).length,
-  }), [])
+    open: jobs.filter((j) => j.status === 'open').length,
+    progress: jobs.filter((j) => ['assigned', 'in_progress'].includes(j.status)).length,
+    submitted: jobs.filter((j) => j.status === 'submitted').length,
+    done: jobs.filter((j) => ['completed', 'approved'].includes(j.status)).length,
+  }), [jobs])
 
   const filtered = useMemo(() => {
     const inTab = (status: string) => {
@@ -77,7 +97,7 @@ export function JobsPage() {
 
     const q = query.trim().toLowerCase()
 
-    return mockJobs
+    return jobs
       .filter((j) => inTab(j.status))
       .filter((j) => inDate(j.jobDate))
       .filter((j) =>
@@ -86,7 +106,7 @@ export function JobsPage() {
         j.property.address.toLowerCase().includes(q) ||
         j.description.toLowerCase().includes(q)
       )
-  }, [tab, from, to, query])
+  }, [tab, from, to, query, jobs])
 
   const data = useMemo(() => {
     const sorted = [...filtered]
@@ -100,8 +120,11 @@ export function JobsPage() {
     return sorted
   }, [filtered, sort])
 
-  const rowPy = density === 'compact' ? 0.75 : 1.25
-  const fontSize = density === 'compact' ? '0.85rem' : '0.95rem'
+  const rowPy = 0.75
+  const fontSize = '0.85rem'
+  const [page, setPage] = useState(0)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
+  const paginated = useMemo(() => data.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage), [data, page, rowsPerPage])
 
   return (
     <PageContainer>
@@ -114,8 +137,8 @@ export function JobsPage() {
         <Button component={Link} to="/jobs/new" variant="contained" startIcon={<AddIcon />}>新規案件作成</Button>
       </Box>
 
-      {/* Status tabs with counts */}
-      <Paper variant="outlined" sx={{ borderRadius: 2 }}>
+      {/* Tabs header (no card) */}
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', bgcolor: 'background.paper', position: 'sticky', top: 0, zIndex: 1 }}>
         <Tabs
           value={tab}
           onChange={(_, v) => setTab(v)}
@@ -128,11 +151,11 @@ export function JobsPage() {
           <Tab value="submitted" label={`確認待ち (${counts.submitted})`} />
           <Tab value="done" label={`完了 (${counts.done})`} />
         </Tabs>
-      </Paper>
+      </Box>
 
-      {/* Filter toolbar */}
-      <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} alignItems={{ xs: 'stretch', md: 'center' }}>
+      {/* Filter row (no card) */}
+      <Box sx={{ py: 0, px: 2, borderColor: 'divider', bgcolor: 'background.paper', position: 'sticky', top: 48, zIndex: 1 }}>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={1.5} alignItems={{ xs: 'stretch', md: 'center' }}>
           <TextField
             fullWidth
             value={query}
@@ -177,37 +200,28 @@ export function JobsPage() {
               <MenuItem value="pay_asc">報酬(低い順)</MenuItem>
             </Select>
           </FormControl>
-          <ToggleButtonGroup
-            size="small"
-            exclusive
-            value={density}
-            onChange={(_, v) => v && setDensity(v)}
-          >
-            <ToggleButton value="comfortable">標準</ToggleButton>
-            <ToggleButton value="compact">コンパクト</ToggleButton>
-          </ToggleButtonGroup>
+          <Button size="small" color="inherit" onClick={() => { setQuery(''); setFrom(''); setTo(''); setSort('date_desc') }}>全クリア</Button>
         </Stack>
-      </Paper>
+      </Box>
 
       {/* Results table */}
-      <Paper variant="outlined" sx={{ borderRadius: 2 }}>
-        <TableContainer sx={{ maxHeight: 560 }}>
-          <Table stickyHeader size={density === 'compact' ? 'small' : 'medium'}>
+      <Paper variant="outlined" sx={{ borderRadius: 1, overflow: 'hidden' }}>
+        <TableContainer sx={{ maxHeight: 560, overflowX: 'auto', width: '100%' }}>
+          <Table stickyHeader size="small" sx={{ minWidth: 900 }}>
             <TableHead>
-              <TableRow>
+              <TableRow sx={{ backgroundColor: 'grey.100' }}>
                 <TableCell>物件</TableCell>
                 <TableCell>日付・時間</TableCell>
-                <TableCell>想定時間</TableCell>
                 <TableCell>報酬</TableCell>
                 <TableCell>担当/応募</TableCell>
                 <TableCell>ステータス</TableCell>
-                <TableCell align="right">操作</TableCell>
+                <TableCell align="center">操作</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {data.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7}>
+                  <TableCell colSpan={6}>
                     <Box py={6} textAlign="center">
                       <Typography variant="subtitle1" fontWeight={700}>該当する案件がありません</Typography>
                       <Typography variant="body2" color="text.secondary" mt={0.5}>条件を調整してください</Typography>
@@ -215,7 +229,7 @@ export function JobsPage() {
                   </TableCell>
                 </TableRow>
               )}
-              {data.map((j) => (
+              {paginated.map((j) => (
                 <TableRow key={j.id} hover sx={{ '& td': { py: rowPy, fontSize } }}>
                   <TableCell>
                     <Stack spacing={0.5}>
@@ -240,12 +254,6 @@ export function JobsPage() {
                   </TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={0.75} alignItems="center">
-                      <AccessTimeIcon fontSize="small" color="action" />
-                      <Typography variant="body2">{j.expectedHours}時間</Typography>
-                    </Stack>
-                  </TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={0.75} alignItems="center">
                       <AttachMoneyIcon fontSize="small" color="action" />
                       <Typography variant="body2">¥{j.payAmount.toLocaleString()}・{getPayTypeLabel(j.payType)}</Typography>
                     </Stack>
@@ -266,18 +274,147 @@ export function JobsPage() {
                   <TableCell>
                     <StatusBadge status={j.status} />
                   </TableCell>
-                  <TableCell align="right">
-                    <Stack direction="row" spacing={1} justifyContent="flex-end">
-                      <Button component={Link} to={`/jobs/${j.id}`} size="small" variant="contained">管理</Button>
-                      <Button size="small" variant="outlined">詳細</Button>
-                    </Stack>
+                  <TableCell align="center">
+                    <JobActionSplitButton
+                      jobId={j.id}
+                      currentStatus={j.status as JobStatus}
+                      onChangeStatus={(status) => {
+                        setJobs((prev) => prev.map((row) => row.id === j.id ? { ...row, status } : row))
+                      }}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+        <TablePagination
+          component="div"
+          count={data.length}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={(e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0) }}
+          rowsPerPageOptions={[10, 25, 50]}
+          labelRowsPerPage="1ページあたり"
+        />
       </Paper>
     </PageContainer>
+  )
+}
+
+// 操作スプリットボタン（物件管理ページと同じスタイル）
+type JobActionKey = 'manage' | 'copy' | 'edit' | 'view' | 'delete'
+
+function JobActionSplitButton({ jobId, currentStatus, onChangeStatus }: { jobId: string, currentStatus: JobStatus, onChangeStatus: (s: JobStatus) => void }) {
+  const navigate = useNavigate()
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const open = Boolean(anchorEl)
+  const [selected, setSelected] = useState<JobActionKey>('manage')
+  const statusOptions: { value: JobStatus, label: string }[] = [
+    { value: 'open', label: '公開中' },
+    { value: 'assigned', label: '割当済み' },
+    { value: 'in_progress', label: '作業中' },
+    { value: 'submitted', label: '提出済み' },
+    { value: 'completed', label: '完了' },
+    { value: 'approved', label: '承認済み' },
+    { value: 'rework', label: '再作業' },
+    { value: 'cancelled', label: 'キャンセル' },
+    { value: 'draft', label: '下書き' },
+  ]
+
+  const handleMainClick = () => {
+    switch (selected) {
+      case 'manage':
+        navigate(`/jobs/${jobId}`)
+        break
+      case 'edit':
+        // 編集画面未実装のため暫定で詳細に遷移
+        navigate(`/jobs/${jobId}`)
+        break
+      case 'view':
+        navigate(`/jobs/${jobId}`)
+        break
+      case 'copy':
+      case 'delete':
+      default:
+        // eslint-disable-next-line no-console
+        console.log(`${selected} 実行`, { jobId })
+    }
+  }
+
+  const handleToggle = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleClose = () => setAnchorEl(null)
+  const selectAndClose = (key: JobActionKey) => () => {
+    setSelected(key)
+    setAnchorEl(null)
+  }
+
+  const menuItemSx = { fontSize: 14 }
+
+  return (
+    <>
+      <ButtonGroup
+        variant="contained"
+        sx={{
+          bgcolor: '#374151',
+          '&:hover': { bgcolor: '#323844' },
+          boxShadow: 'none',
+          '& .MuiButton-root': { color: '#fff', textWrap: 'nowrap' },
+          '& .MuiButtonGroup-grouped:not(:last-of-type)': { borderColor: 'rgba(255,255,255,0.35)' },
+        }}
+      >
+        <Button onClick={handleMainClick} sx={{ px: 2.5 }}>
+          {selected === 'manage' && '管理する'}
+          {selected === 'copy' && 'コピーする'}
+          {selected === 'edit' && '編集する'}
+          {selected === 'view' && '確認する'}
+          {selected === 'delete' && '削除する'}
+        </Button>
+        <Button onClick={handleToggle} sx={{ minWidth: 40, px: 1 }} aria-haspopup="menu" aria-expanded={open ? 'true' : undefined}>
+          <ArrowDropDownIcon />
+        </Button>
+      </ButtonGroup>
+
+      <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+        <MenuItem onClick={selectAndClose('manage')} sx={menuItemSx}>
+          <ListItemIcon><AssignmentTurnedInIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>管理する</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={selectAndClose('copy')} sx={menuItemSx}>
+          <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>コピーする</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={selectAndClose('edit')} sx={menuItemSx}>
+          <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>編集する</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={selectAndClose('view')} sx={menuItemSx}>
+          <ListItemIcon><VisibilityIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>確認する</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={selectAndClose('delete')} sx={{ ...menuItemSx, color: 'error.main' }}>
+          <ListItemIcon sx={{ color: 'error.main' }}><DeleteOutlineIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>削除する</ListItemText>
+        </MenuItem>
+        <Divider sx={{ my: 0.5 }} />
+        <MenuItem disabled sx={{ fontSize: 12, color: 'text.secondary', cursor: 'default' }}>
+          ステータス変更
+        </MenuItem>
+        {statusOptions.map((opt) => (
+          <MenuItem
+            key={opt.value}
+            onClick={() => { onChangeStatus(opt.value); handleClose() }}
+            disabled={currentStatus === opt.value}
+            sx={{ fontSize: 14 }}
+          >
+            <ListItemText>{opt.label}</ListItemText>
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
   )
 }
