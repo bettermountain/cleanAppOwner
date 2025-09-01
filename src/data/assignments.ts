@@ -135,4 +135,36 @@ export const mockAssignments: Assignment[] = [
     },
     notes: 'リネン類の管理も含めて完璧に作業していただきました。'
   }
+  ,
+  // --- Test data: likely no-show (assigned, not checked in, start time passed) ---
+  {
+    id: 'assignment-006',
+    jobId: 'job-013',
+    workerId: 'worker-010',
+    workerName: '中村 海斗',
+    propertyName: '上野ガーデンフラット201',
+    jobDate: '2025-09-01',
+    startTime: '08:00',
+    status: 'assigned',
+    progress: 0,
+    currentTask: '開始待ち',
+    photosSubmitted: 0,
+    totalPhotosRequired: 10,
+    notes: '未到着テストデータ（開始時刻を過ぎています）'
+  },
+  {
+    id: 'assignment-007',
+    jobId: 'job-014',
+    workerId: 'worker-011',
+    workerName: '小林 美優',
+    propertyName: '中目黒リバーサイド402',
+    jobDate: '2025-08-31',
+    startTime: '15:00',
+    status: 'assigned',
+    progress: 0,
+    currentTask: '開始待ち',
+    photosSubmitted: 0,
+    totalPhotosRequired: 8,
+    notes: '未到着テストデータ（前日の予定）'
+  }
 ]

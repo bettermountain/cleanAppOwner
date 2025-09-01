@@ -4,6 +4,8 @@ import { PageContainer } from '@/components/layout/page-container'
 import { mockNotifications } from '@/data/notifications'
 import { mockJobs } from '@/data/jobs'
 import { mockInvoices } from '@/data/invoices'
+import { mockChatThreads } from '@/data/chats'
+import { mockAssignments } from '@/data/assignments'
 
 import {
   Box,
@@ -48,7 +50,19 @@ export function DashboardPage() {
     const unpaidTotal = mockInvoices
       .filter(inv => ['issued', 'overdue'].includes(inv.status))
       .reduce((sum, inv) => sum + inv.total, 0)
-    return { unread, openJobs, upcomingThisWeek, unpaid, unpaidTotal }
+    // Detect likely no-shows: assigned, not checked in, start time passed + 15min
+    const noShowGraceMin = 15
+    const likelyNoShows = mockAssignments.filter(a => {
+      if (a.status !== 'assigned') return false
+      const hasCheckedIn = Boolean(a.checkedInAt)
+      if (hasCheckedIn) return false
+      const scheduled = new Date(`${a.jobDate}T${a.startTime}:00`)
+      const diffMin = Math.floor((now.getTime() - scheduled.getTime()) / 60000)
+      return diffMin > noShowGraceMin
+    })
+
+    const unreadMessages = mockChatThreads.reduce((sum, t) => sum + (t.unreadCount || 0), 0)
+    return { unread, openJobs, upcomingThisWeek, unpaid, unpaidTotal, noShowCount: likelyNoShows.length, unreadMessages }
   }, [])
 
   // 近日の清掃（5件）
@@ -80,6 +94,7 @@ export function DashboardPage() {
         <Box display="flex" gap={1} flexWrap="wrap" width={{ xs: '100%', sm: 'auto' }} justifyContent={{ xs: 'flex-end', sm: 'flex-start' }}>
           <Button component={Link} to="/jobs" variant="contained" startIcon={<AddIcon />}>案件を作成</Button>
           <Button component={Link} to="/properties" variant="outlined">物件を追加</Button>
+          <Button component={Link} to="/chat" variant="outlined" color="primary" endIcon={<ArrowForwardIcon />}>チャット（未読 {stats.unreadMessages}）</Button>
         </Box>
       </Box>
 
@@ -132,6 +147,17 @@ export function DashboardPage() {
             </Avatar>
           </Paper>
         </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Paper sx={{ p: 2, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Box>
+              <Typography variant="subtitle2" color="error.main">未到着の疑い</Typography>
+              <Typography variant="h4">{stats.noShowCount}</Typography>
+            </Box>
+            <Avatar sx={{ bgcolor: 'error.main' }}>
+              <AccessTimeIcon />
+            </Avatar>
+          </Paper>
+        </Grid>
       </Grid>
 
       {/* Content sections */}
@@ -176,7 +202,7 @@ export function DashboardPage() {
           </Paper>
         </Grid>
 
-        {/* Recent notifications */}
+        {/* Recent notifications + No-show watch */}
         <Grid item xs={12} md={5}>
           <Paper sx={{ p: 2 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
@@ -213,6 +239,13 @@ export function DashboardPage() {
               </List>
             )}
           </Paper>
+          {/* No-show watchlist */}
+          <Paper sx={{ p: 2, mt: 2 }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+              <Typography variant="h6">未到着の疑い</Typography>
+            </Box>
+            <NoShowWatchList />
+          </Paper>
         </Grid>
       </Grid>
 
@@ -227,5 +260,56 @@ export function DashboardPage() {
         <Button component={Link} to="/billing" variant="outlined" endIcon={<ArrowForwardIcon />} sx={{ alignSelf: { xs: 'flex-end', sm: 'center' } }}>請求を確認</Button>
       </Paper>
     </PageContainer>
+  )
+}
+
+// Sub-component: list likely no-shows with delay minutes
+function NoShowWatchList() {
+  const items = useMemo(() => {
+    const now = new Date()
+    const grace = 15
+    return mockAssignments
+      .filter(a => a.status === 'assigned' && !a.checkedInAt)
+      .map(a => {
+        const scheduled = new Date(`${a.jobDate}T${a.startTime}:00`)
+        const diffMin = Math.floor((now.getTime() - scheduled.getTime()) / 60000)
+        return { a, diffMin }
+      })
+      .filter(x => x.diffMin > grace)
+      .sort((x, y) => y.diffMin - x.diffMin)
+      .slice(0, 5)
+  }, [])
+
+  if (items.length === 0) {
+    return <Box textAlign="center" py={4} color="text.secondary">未到着の疑いはありません</Box>
+  }
+
+  return (
+    <List>
+      {items.map(({ a, diffMin }) => (
+        <ListItem key={a.id} divider secondaryAction={
+          <Chip size="small" label={`${diffMin}分遅れ`} color="error" variant="outlined" />
+        }>
+          <ListItemAvatar>
+            <Avatar sx={{ bgcolor: 'error.light' }}>
+              <AccessTimeIcon fontSize="small" />
+            </Avatar>
+          </ListItemAvatar>
+          <ListItemText
+            primary={
+              <Box display="flex" alignItems="center" gap={1}>
+                <Typography fontWeight={600}>{a.propertyName}</Typography>
+                <Typography variant="body2" color="text.secondary">{a.workerName}</Typography>
+              </Box>
+            }
+            secondary={
+              <Typography variant="body2" color="text.secondary">
+                予定 {a.jobDate} {a.startTime} ・ 現地到着未確認
+              </Typography>
+            }
+          />
+        </ListItem>
+      ))}
+    </List>
   )
 }

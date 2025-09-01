@@ -29,6 +29,7 @@ import {
   Menu,
   Divider,
   TablePagination,
+  TableSortLabel,
   ListItemIcon,
   ListItemText,
 } from '@mui/material'
@@ -67,7 +68,7 @@ export function JobsPage() {
   const [tab, setTab] = useState<'all' | 'open' | 'progress' | 'submitted' | 'done'>('all')
   const [from, setFrom] = useState('') // YYYY-MM-DD
   const [to, setTo] = useState('')
-  const [sort, setSort] = useState<'date_desc' | 'date_asc' | 'pay_desc' | 'pay_asc'>('date_desc')
+  const [sort, setSort] = useState<'date_desc' | 'date_asc' | 'pay_desc' | 'pay_asc' | 'property_asc' | 'property_desc'>('date_desc')
   // 常にコンパクト表示
 
   const getPayTypeLabel = (payType: string) => (payType === 'hourly' ? '時給' : '固定')
@@ -108,17 +109,23 @@ export function JobsPage() {
       )
   }, [tab, from, to, query, jobs])
 
+  const collator = useMemo(() => new Intl.Collator('ja', { numeric: true, sensitivity: 'base' }), [])
+
   const data = useMemo(() => {
     const sorted = [...filtered]
     sorted.sort((a, b) => {
-      if (sort === 'date_desc') return a.jobDate < b.jobDate ? 1 : -1
-      if (sort === 'date_asc') return a.jobDate > b.jobDate ? 1 : -1
+      const ta = new Date(`${a.jobDate}T${a.startTime}:00`).getTime()
+      const tb = new Date(`${b.jobDate}T${b.startTime}:00`).getTime()
+      if (sort === 'date_desc') return tb - ta
+      if (sort === 'date_asc') return ta - tb
       if (sort === 'pay_desc') return b.payAmount - a.payAmount
       if (sort === 'pay_asc') return a.payAmount - b.payAmount
+      if (sort === 'property_asc') return collator.compare(a.property.name, b.property.name)
+      if (sort === 'property_desc') return collator.compare(b.property.name, a.property.name)
       return 0
     })
     return sorted
-  }, [filtered, sort])
+  }, [filtered, sort, collator])
 
   const rowPy = 0.75
   const fontSize = '0.85rem'
@@ -194,6 +201,8 @@ export function JobsPage() {
               value={sort}
               onChange={(e) => setSort(e.target.value as typeof sort)}
             >
+              <MenuItem value="property_asc">物件名(あ→わ)</MenuItem>
+              <MenuItem value="property_desc">物件名(わ→あ)</MenuItem>
               <MenuItem value="date_desc">日付(新しい順)</MenuItem>
               <MenuItem value="date_asc">日付(古い順)</MenuItem>
               <MenuItem value="pay_desc">報酬(高い順)</MenuItem>
@@ -208,10 +217,26 @@ export function JobsPage() {
       <Paper variant="outlined" sx={{ borderRadius: 1, overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 560, overflowX: 'auto', width: '100%' }}>
           <Table stickyHeader size="small" sx={{ minWidth: 900 }}>
-            <TableHead>
-              <TableRow sx={{ backgroundColor: 'grey.100' }}>
-                <TableCell>物件</TableCell>
-                <TableCell>日付・時間</TableCell>
+          <TableHead>
+            <TableRow sx={{ backgroundColor: 'grey.100' }}>
+                <TableCell sortDirection={sort.startsWith('property_') ? (sort.endsWith('asc') ? 'asc' : 'desc') : false}>
+                  <TableSortLabel
+                    active={sort.startsWith('property_')}
+                    direction={sort === 'property_desc' ? 'desc' : 'asc'}
+                    onClick={() => { setSort(sort === 'property_asc' ? 'property_desc' : 'property_asc'); setPage(0) }}
+                  >
+                    物件
+                  </TableSortLabel>
+                </TableCell>
+                <TableCell sortDirection={sort.startsWith('date_') ? (sort.endsWith('asc') ? 'asc' : 'desc') : false}>
+                  <TableSortLabel
+                    active={sort.startsWith('date_')}
+                    direction={sort === 'date_desc' ? 'desc' : 'asc'}
+                    onClick={() => { setSort(sort === 'date_asc' ? 'date_desc' : 'date_asc'); setPage(0) }}
+                  >
+                    日付・時間
+                  </TableSortLabel>
+                </TableCell>
                 <TableCell>報酬</TableCell>
                 <TableCell>担当/応募</TableCell>
                 <TableCell>ステータス</TableCell>
@@ -238,15 +263,14 @@ export function JobsPage() {
                         <PlaceIcon fontSize="small" color="action" />
                         <Typography variant="caption" color="text.secondary">{j.property.address}</Typography>
                       </Stack>
-                      <Stack direction="row" spacing={1}>
+                      {/* <Stack direction="row" spacing={1}>
                         {j.publicOrInvite === 'invite_only' && <Chip label="指名限定" size="small" variant="outlined" color="info" />}
                         {j.tipAllowed && <Chip label="チップ可" size="small" variant="outlined" color="success" />}
-                      </Stack>
+                      </Stack> */}
                     </Stack>
                   </TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={0.75} alignItems="center">
-                      <CalendarMonthIcon fontSize="small" color="action" />
                       <Typography variant="body2">
                         {new Date(j.jobDate).toLocaleDateString('ja-JP')} {j.startTime}
                       </Typography>
@@ -254,7 +278,6 @@ export function JobsPage() {
                   </TableCell>
                   <TableCell>
                     <Stack direction="row" spacing={0.75} alignItems="center">
-                      <AttachMoneyIcon fontSize="small" color="action" />
                       <Typography variant="body2">¥{j.payAmount.toLocaleString()}・{getPayTypeLabel(j.payType)}</Typography>
                     </Stack>
                   </TableCell>
@@ -310,7 +333,7 @@ function JobActionSplitButton({ jobId, currentStatus, onChangeStatus }: { jobId:
   const navigate = useNavigate()
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
-  const [selected, setSelected] = useState<JobActionKey>('manage')
+  const [selected, setSelected] = useState<JobActionKey>('view')
   const statusOptions: { value: JobStatus, label: string }[] = [
     { value: 'open', label: '公開中' },
     { value: 'assigned', label: '割当済み' },
@@ -368,7 +391,6 @@ function JobActionSplitButton({ jobId, currentStatus, onChangeStatus }: { jobId:
         }}
       >
         <Button onClick={handleMainClick} sx={{ px: 2.5 }}>
-          {selected === 'manage' && '管理する'}
           {selected === 'copy' && 'コピーする'}
           {selected === 'edit' && '編集する'}
           {selected === 'view' && '確認する'}
@@ -380,9 +402,9 @@ function JobActionSplitButton({ jobId, currentStatus, onChangeStatus }: { jobId:
       </ButtonGroup>
 
       <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-        <MenuItem onClick={selectAndClose('manage')} sx={menuItemSx}>
-          <ListItemIcon><AssignmentTurnedInIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>管理する</ListItemText>
+        <MenuItem onClick={selectAndClose('view')} sx={menuItemSx}>
+          <ListItemIcon><VisibilityIcon fontSize="small" /></ListItemIcon>
+          <ListItemText>確認する</ListItemText>
         </MenuItem>
         <MenuItem onClick={selectAndClose('copy')} sx={menuItemSx}>
           <ListItemIcon><ContentCopyIcon fontSize="small" /></ListItemIcon>
@@ -391,10 +413,6 @@ function JobActionSplitButton({ jobId, currentStatus, onChangeStatus }: { jobId:
         <MenuItem onClick={selectAndClose('edit')} sx={menuItemSx}>
           <ListItemIcon><EditIcon fontSize="small" /></ListItemIcon>
           <ListItemText>編集する</ListItemText>
-        </MenuItem>
-        <MenuItem onClick={selectAndClose('view')} sx={menuItemSx}>
-          <ListItemIcon><VisibilityIcon fontSize="small" /></ListItemIcon>
-          <ListItemText>確認する</ListItemText>
         </MenuItem>
         <MenuItem onClick={selectAndClose('delete')} sx={{ ...menuItemSx, color: 'error.main' }}>
           <ListItemIcon sx={{ color: 'error.main' }}><DeleteOutlineIcon fontSize="small" /></ListItemIcon>

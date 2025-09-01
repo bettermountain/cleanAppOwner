@@ -1,4 +1,4 @@
-import { createTheme } from '@mui/material/styles'
+import { createTheme, responsiveFontSizes } from '@mui/material/styles'
 import { jaJP } from '@mui/material/locale'
 
 function readCssVar(name: string): string | undefined {
@@ -14,7 +14,7 @@ export function createThemeFromCssVars() {
   const primaryDark = readCssVar('--mui-primary-dark') || '#1565c0'
   const primaryContrast = readCssVar('--mui-primary-contrast') || '#ffffff'
 
-  return createTheme(
+  const base = createTheme(
     {
       palette: {
         primary: {
@@ -109,10 +109,11 @@ export function createThemeFromCssVars() {
     },
     jaJP
   )
+  return responsiveFontSizes(base)
 }
 
 // Fallback theme for initial render or environments without CSS variables
-export const fallbackTheme = createTheme(
+const fallbackBase = createTheme(
   {
     palette: {
       primary: {
@@ -176,3 +177,5 @@ export const fallbackTheme = createTheme(
   },
   jaJP
 )
+
+export const fallbackTheme = responsiveFontSizes(fallbackBase)

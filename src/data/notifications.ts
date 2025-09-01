@@ -86,7 +86,20 @@ export const mockNotifications = [
     payload: {
       jobId: "job-6",
       jobTitle: "アートロフトの軽清掃",
-      propertyName: "上野アートロフト",
+      propertyName: "上野アートロフト102",
+      reason: "ゲストキャンセル",
+    },
+    readAt: "2025-08-28T12:15:00Z",
+    createdAt: "2025-08-28T08:00:00Z",
+  },
+    {
+    id: "notif-7",
+    type: "job_cancelled",
+    title: "案件がキャンセルされました",
+    payload: {
+      jobId: "job-6",
+      jobTitle: "アートロフトの軽清掃",
+      propertyName: "上野アートロフト101",
       reason: "ゲストキャンセル",
     },
     readAt: "2025-08-28T12:15:00Z",

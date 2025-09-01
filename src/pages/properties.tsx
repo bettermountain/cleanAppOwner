@@ -14,6 +14,7 @@ import {
   TableCell,
   TableBody,
   TablePagination,
+  TableSortLabel,
   ButtonGroup,
   Menu,
   MenuItem,
@@ -130,7 +131,33 @@ function ActionSplitButton({ propertyId }: { propertyId: string }) {
 export function PropertiesPage() {
   const [page, setPage] = React.useState(0)
   const [rowsPerPage, setRowsPerPage] = React.useState(10)
-  const paginated = mockProperties.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+  const [order, setOrder] = React.useState<'asc' | 'desc'>('asc')
+  const [orderBy, setOrderBy] = React.useState<'name' | 'publicName' | 'address'>('name')
+
+  // Locale-aware comparator for Japanese strings
+  const collator = React.useMemo(() => new Intl.Collator('ja', { numeric: true, sensitivity: 'base' }), [])
+  const comparator = React.useCallback(
+    (a: typeof mockProperties[number], b: typeof mockProperties[number]) => {
+      const av = a[orderBy] as string
+      const bv = b[orderBy] as string
+      const result = collator.compare(av ?? '', bv ?? '')
+      return order === 'asc' ? result : -result
+    },
+    [order, orderBy, collator]
+  )
+
+  const sorted = React.useMemo(() => [...mockProperties].sort(comparator), [comparator])
+  const paginated = React.useMemo(
+    () => sorted.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+    [sorted, page, rowsPerPage]
+  )
+
+  const handleRequestSort = (property: 'name' | 'publicName' | 'address') => () => {
+    const isAsc = orderBy === property && order === 'asc'
+    setOrder(isAsc ? 'desc' : 'asc')
+    setOrderBy(property)
+    setPage(0)
+  }
 
   return (
     <PageContainer>
@@ -163,7 +190,7 @@ export function PropertiesPage() {
               ),
             }}
           />
-          <Button variant="outlined" startIcon={<MapPin size={16} />}>地図表示</Button>
+          {/* <Button variant="outlined" startIcon={<MapPin size={16} />}>地図表示</Button> */}
         </Box>
       </Box>
 
@@ -172,9 +199,33 @@ export function PropertiesPage() {
         <Table sx={{ minWidth: 720 }}>
           <TableHead>
             <TableRow sx={{ backgroundColor: 'grey.100' }}>
-              <TableCell>物件名</TableCell>
-              <TableCell>公開名</TableCell>
-              <TableCell>住所</TableCell>
+              <TableCell sortDirection={orderBy === 'name' ? order : false}>
+                <TableSortLabel
+                  active={orderBy === 'name'}
+                  direction={orderBy === 'name' ? order : 'asc'}
+                  onClick={handleRequestSort('name')}
+                >
+                  物件名
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sortDirection={orderBy === 'publicName' ? order : false}>
+                <TableSortLabel
+                  active={orderBy === 'publicName'}
+                  direction={orderBy === 'publicName' ? order : 'asc'}
+                  onClick={handleRequestSort('publicName')}
+                >
+                  公開名
+                </TableSortLabel>
+              </TableCell>
+              <TableCell sortDirection={orderBy === 'address' ? order : false}>
+                <TableSortLabel
+                  active={orderBy === 'address'}
+                  direction={orderBy === 'address' ? order : 'asc'}
+                  onClick={handleRequestSort('address')}
+                >
+                  住所
+                </TableSortLabel>
+              </TableCell>
               <TableCell align="center">操作</TableCell>
             </TableRow>
           </TableHead>

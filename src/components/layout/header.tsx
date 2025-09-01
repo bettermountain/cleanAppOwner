@@ -3,10 +3,11 @@ import { Search, Bell, User, Menu } from 'lucide-react'
 
 type HeaderProps = {
   onMenuClick?: () => void
+  onToggleSidebar?: () => void
 }
 
 // Responsive application header built with Material UI for a clean UX
-export function Header({ onMenuClick }: HeaderProps) {
+export function Header({ onMenuClick, onToggleSidebar }: HeaderProps) {
   return (
     <AppBar 
       position="sticky" 
@@ -19,9 +20,16 @@ export function Header({ onMenuClick }: HeaderProps) {
       }}
     >
       <Toolbar sx={{ justifyContent: 'space-between', gap: 1 }}>
-        {/* Mobile menu button */}
+        {/* Mobile: open temporary drawer */}
         <Box sx={{ display: { xs: 'flex', sm: 'none' } }}>
           <IconButton color="inherit" onClick={onMenuClick} aria-label="open navigation">
+            <Menu size={20} />
+          </IconButton>
+        </Box>
+
+        {/* Desktop: collapse/expand sidebar */}
+        <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
+          <IconButton color="inherit" onClick={onToggleSidebar} aria-label="toggle sidebar">
             <Menu size={20} />
           </IconButton>
         </Box>
