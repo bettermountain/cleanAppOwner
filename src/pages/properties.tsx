@@ -43,8 +43,8 @@ function ActionSplitButton({ propertyId }: { propertyId: string }) {
   const handleMainClick = () => {
     switch (selected) {
       case 'create':
-        // 既存画面: 案件一覧/作成画面へ
-        navigate('/jobs')
+        // 依頼作成ページへ遷移（物件IDを引き継ぎ）
+        navigate(`/jobs/new?propertyId=${propertyId}`)
         break
       case 'edit':
         // 物件編集ページが未定のため暫定で物件一覧に遷移

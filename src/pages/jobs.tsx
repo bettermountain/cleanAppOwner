@@ -111,7 +111,7 @@ export function JobsPage() {
           <Typography variant="h4" fontWeight={700}>案件管理</Typography>
           <Typography variant="body2" color="text.secondary" mt={0.5}>清掃案件の作成・管理・進捗確認</Typography>
         </Box>
-        <Button variant="contained" startIcon={<AddIcon />}>新規案件作成</Button>
+        <Button component={Link} to="/jobs/new" variant="contained" startIcon={<AddIcon />}>新規案件作成</Button>
       </Box>
 
       {/* Status tabs with counts */}

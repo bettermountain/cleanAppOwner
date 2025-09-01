@@ -1,0 +1,138 @@
+.tf {
+  position: relative;
+  display: block;
+  width: 100%;
+  transition: border-color .2s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease;
+}
+
+/* Size presets via data-size */
+.tf[data-size="sm"] { --field-font-size: var(--field-font-sm); --field-height: var(--field-height-sm); }
+.tf[data-size="md"] { --field-font-size: var(--field-font-md); --field-height: var(--field-height-md); }
+.tf[data-size="lg"] { --field-font-size: var(--field-font-lg); --field-height: var(--field-height-lg); }
+
+/* Variants */
+.tf.tf--outline {
+  border: 1px solid var(--field-border);
+  border-radius: var(--field-radius);
+  background: var(--field-bg);
+}
+.tf.tf--outline:hover { border-color: var(--field-border-hover); }
+.tf.tf--outline:focus-within {
+  border-color: var(--field-focus);
+  box-shadow: var(--field-ring);
+}
+
+.tf.tf--soft {
+  border: 1px solid transparent;
+  border-radius: var(--field-radius);
+  background: var(--field-bg-soft);
+}
+.tf.tf--soft:hover { filter: brightness(0.98); }
+.tf.tf--soft:focus-within {
+  border-color: var(--field-focus);
+  background: var(--field-bg);
+  box-shadow: var(--field-ring);
+}
+
+.tf.tf--underline {
+  border: 0;
+  border-bottom: 2px solid var(--field-border);
+  border-radius: 0;
+  background: transparent;
+}
+.tf.tf--underline:hover { border-bottom-color: var(--field-border-hover); }
+.tf.tf--underline:focus-within { border-bottom-color: var(--field-focus); }
+
+/* States */
+.tf[data-state="error"].tf--outline,
+.tf[data-state="error"].tf--soft {
+  border-color: var(--field-danger);
+  box-shadow: var(--field-ring-error);
+}
+.tf[data-state="error"].tf--underline {
+  border-bottom-color: var(--field-danger);
+}
+.tf[data-state="success"].tf--outline,
+.tf[data-state="success"].tf--soft {
+  border-color: var(--field-success);
+  box-shadow: 0 0 0 4px rgba(22,163,74,0.12);
+}
+
+.tf[data-disabled="true"] { opacity: .6; cursor: not-allowed; }
+
+/* Control (input/textarea) */
+.tf__control {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--field-text);
+  font-size: var(--field-font-size, var(--field-font-lg));
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  padding: var(--field-padding-y) var(--field-padding-x);
+  caret-color: var(--field-focus);
+}
+.tf__control--select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+}
+
+.tf:not([data-textarea="true"]) .tf__control { height: var(--field-height, var(--field-height-lg)); }
+.tf__control::placeholder { color: var(--field-placeholder); }
+.tf:focus-within .tf__control::placeholder { opacity: .6; }
+
+/* Prefix/Suffix */
+.tf__prefix, .tf__suffix {
+  position: absolute;
+  inset-block: 0;
+  display: inline-flex;
+  align-items: center;
+  color: var(--field-placeholder);
+}
+.tf__prefix { left: 0; padding-inline-start: calc(var(--field-padding-x)); }
+.tf__suffix { right: 0; padding-inline-end: calc(var(--field-padding-x)); }
+
+.tf[data-has-prefix="true"] .tf__control {
+  padding-left: calc(var(--field-padding-x) + var(--field-adorn-w) + var(--field-adorn-gap));
+}
+.tf[data-has-suffix="true"] .tf__control {
+  padding-right: calc(var(--field-padding-x) + var(--field-adorn-w) + var(--field-adorn-gap));
+}
+
+/* Floating label */
+.tf__label {
+  position: absolute;
+  left: var(--field-padding-x);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--field-label);
+  background: var(--field-bg);
+  padding: 0 4px;
+  border-radius: 6px;
+  transition: all .2s ease;
+  pointer-events: none;
+  font-size: 14px;
+}
+.tf[data-has-prefix="true"] .tf__label {
+  left: calc(var(--field-padding-x) + var(--field-adorn-w) + var(--field-adorn-gap));
+}
+.tf:focus-within .tf__label,
+.tf[data-has-value="true"] .tf__label {
+  top: 0;
+  transform: translateY(-50%);
+  font-size: 12px;
+}
+
+/* Helper row */
+.tf__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 4px;
+}
+.tf__error { color: var(--field-danger); font-size: 12px; }
+.tf__desc { color: var(--field-label); font-size: 12px; }
+.tf__counter { color: var(--field-placeholder); font-size: 11px; font-variant-numeric: tabular-nums; }

@@ -7,6 +7,7 @@ import { LoginPage } from '@/pages/login';
 import { PropertiesPage } from '@/pages/properties';
 import { PropertyNewPage } from '@/pages/property-new';
 import { JobsPage } from '@/pages/jobs';
+import { JobNewPage } from '@/pages/job-new';
 import { JobDetailPage } from '@/pages/job-detail';
 import { FavoriteStaffPage } from '@/pages/favorites';
 import { ProgressPage } from '@/pages/progress';
@@ -48,6 +49,7 @@ function App() {
             <Route path="/properties" element={<PropertiesPage />} />
             <Route path="/properties/new" element={<PropertyNewPage />} />
             <Route path="/jobs" element={<JobsPage />} />
+            <Route path="/jobs/new" element={<JobNewPage />} />
             <Route path="/jobs/:id" element={<JobDetailPage />} />
             <Route path="/favorites" element={<FavoriteStaffPage />} />
             <Route path="/progress" element={<ProgressPage />} />
